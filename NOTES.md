@@ -371,6 +371,12 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   the page walks the same trees in JavaScript. Any number you type gets a live answer.
   Checked: on 2,000 random applicants, 0 decisions differ from Python. Also on Cloudflare:
   https://race-blind-isnt-fair.pages.dev
+- **Robustness pack** (blind judges' #1 criticism: no credit scores). `src/robustness.py`: county credit data from the
+  Urban Institute (collections, card delinquency) → model A still 3.11×; credit-history denials removed → 2.97×;
+  tract-clustered CIs 2.78–3.28×; tuned logistic regression 0.439, other boosted trees 0.515 / 2.64×; fix at the same
+  flag rate 1.22×. `src/robustness_c.py`: C on all 146,793 rows → 0.95×. Headline numbers unchanged.
+- **Lender audit page** `docs/lenders.html` (data from `src/export_lenders.py`): all lenders, anonymised, range bars,
+  Georgia/NC switch, "look closer" filter. Linked from the demo as step 4.
 - **Where it fails** (`src/failures.py` → `results_failures.md`; the 57-repo blind judge's top suggestion): real
   failure cases. Misses: 53% of denials, and over half of those were denied for reasons we can't see (credit
   history etc., from HMDA's denial-reason field). False alarm example: $60K, 18% down, 99%-minority area, bank

@@ -11,6 +11,7 @@
 >
 > - **Try it live:** [fairview-ai.pages.dev](https://fairview-ai.pages.dev) (same person, switch only the address; works on phones)
 > - **The finding:** 2,718 bank-approved Black Georgians wrongly flagged by a race-blind model (stable across 5 retrains: 2.85–2.95×); neighbourhood explains ~56% of the excess gap
+> - **Lender audit page:** [fairview-ai.pages.dev/lenders.html](https://fairview-ai.pages.dev/lenders.html), all 60 Georgia and 42 NC lenders, anonymised, with uncertainty
 > - **The tool:** `python src/audit_lender.py --lei <lender>` gives a one-page screening report for any lender
 >
 > ![The fix](figures/3_the_fix.png)
@@ -36,6 +37,8 @@
 **Confidence intervals** resample only the 2023 test rows (200 draws). They don't include training randomness or clustering by lender or tract, so they are somewhat too narrow.
 
 **Second state (North Carolina, `src/other_state.py`, `results_nc.md`).** NC 2023 denial rates: white 5.0%, Black 13.7%. Test 1, Georgia models unchanged on NC 2023: A gives 1.95× (1.81–2.08), C gives 1.46× (1.38–1.56). Test 2, the same recipe trained on NC 2022: A 2.09×, B 1.72×, C 1.42× (1.31–1.54); PR-AUC 0.489 / 0.488 / 0.475. The direction of every result repeats, but the gaps are smaller and the fairness rule removes less of the gap than in Georgia.
+
+**Robustness** (`src/robustness.py`, `results_robustness.md`). The missing-credit-score objection, tested four ways. Adding the Urban Institute's county credit data (share with debt in collections, card delinquency; Aug 2023 bureau records, `data/external/`) to model A: 3.11× (vs 3.01×). Dropping every application denied for credit history (HMDA denial reasons) and retraining: 2.97×. Confidence ranges that resample whole census tracts (2,740): 2.78–3.28×. At the same flag rate as A, C is 1.22×; C retrained on all 146,793 rows (`results_robustness_c.md`) reaches 0.95× at PR-AUC 0.494. Baselines: tuned logistic regression 0.439, HistGradientBoosting 0.515 (and 2.64×, so the gap is not XGBoost-specific). Note: county credit data itself carries race; it pushes model B from 1.88× to 2.53×. Lender audit with county credit: median gap 1.65× → 1.50×, 26 of 60 still above 1 (simple ranges).
 
 **Where it fails** (`src/failures.py`, `results_failures.md`). Model A misses 53% of real denials; 53% of those misses were denied for reasons public data can't show (credit history, incomplete or unverifiable applications), using HMDA's own denial-reason field. Swapping only the neighbourhood clears 53% of the 2,718 Black false alarms. Model C newly flags 1,215 bank-approved white applicants (net +747), catches 44% of denials vs 47%, and also lowers Hispanic false alarms (1.61× → 0.96× the white rate).
 
@@ -63,6 +66,9 @@ python src/asian_indian.py    #    Asian Indian vs. white numbers in WRITEUP 'Wh
 python src/case_study.py      #    one real applicant model A wrongly flags -> results_case_study.md
 python src/lender_chart.py    #    lender chart + multiple-testing correction -> results_lenders_strict.md, figures/4_lenders.png
 python src/seeds.py           #    retrain A, B, C with 5 seeds (training randomness) -> results_seeds.md
+python src/robustness.py      #    credit stand-ins (Urban Institute county data), credit-history denials removed, same-flag-rate fix, stronger baselines, tract-level CIs -> results_robustness.md
+python src/robustness_c.py    #    model C retrained on all of 2022 (slow) -> results_robustness_c.md
+python src/export_lenders.py  #    lender results for the web page -> docs/lenders.json
 python src/failures.py        #    where it fails: misses by the bank's denial reason, address-only false alarms, fix costs by group -> results_failures.md
 python src/charts.py          # 7. charts -> figures/
 python app/app.py             # 8. the demo app -> http://127.0.0.1:7860

@@ -1,0 +1,160 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FairView · Lender audit</title>
+<link rel="icon" type="image/svg+xml" href="favicon.svg">
+<meta name="description" content="Which mortgage lenders deny Black applicants more often than their finances explain? An anonymised screening of 60 Georgia and 42 North Carolina lenders.">
+<style>
+:root { --serif:"New York",ui-serif,"Iowan Old Style",Georgia,serif; --sans:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",system-ui,sans-serif;
+  --bg:#FBFBFD; --surface:#FFFFFF; --input:#F5F7FB; --ink:#0B1A33; --muted:#5A6780; --line:#E3E7EF; --line2:#D5DBE6;
+  --navy:#0B2A5B; --ok:#127A5B; --no:#B4233C; --focus:#2C5AA0; --track:#E8ECF3; --sky:#A9C1E3;
+  --shadow:0 1px 2px rgba(11,26,51,.04),0 12px 32px -12px rgba(11,26,51,.12); color-scheme: light; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.55 var(--sans); -webkit-font-smoothing: antialiased; }
+body { overflow-x: hidden; }
+a { color: var(--navy); }
+:focus-visible { outline: 2px solid var(--focus); outline-offset: 2px; border-radius: 6px; }
+.wrap { max-width: 1120px; margin: 0 auto; padding: 0 max(20px, env(safe-area-inset-right)) 56px max(20px, env(safe-area-inset-left)); }
+.top { background: linear-gradient(180deg,#0A1F45 0%,#123668 55%,#2C5A9A 100%); color: #FBFBFD; padding: 28px 0 64px; }
+.nav { display: flex; justify-content: space-between; align-items: center; gap: 16px; font-size: 15px; }
+.brand { display: flex; align-items: center; gap: 10px; font-weight: 600; color: #FBFBFD; text-decoration: none; }
+.brand img { width: 28px; height: 28px; border-radius: 7px; }
+.nav a.back { color: rgba(251,251,253,.85); text-decoration: none; }
+.nav a.back:hover { color: #fff; text-decoration: underline; }
+h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(36px,5vw,60px); line-height: 1.06; letter-spacing: -0.015em; margin: 48px 0 0; max-width: 820px; text-wrap: balance; }
+.lede { font-size: 18px; color: rgba(251,251,253,.86); max-width: 680px; margin: 18px 0 0; text-wrap: pretty; }
+.stats { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 16px; margin-top: -36px; position: relative; }
+.stat { background: var(--surface); border-radius: 18px; box-shadow: var(--shadow); padding: 20px 22px; }
+.stat strong { display: block; font-family: var(--serif); font-weight: 400; font-size: 40px; line-height: 1; font-variant-numeric: tabular-nums; }
+.stat span { display: block; font-size: 14px; color: var(--muted); margin-top: 8px; }
+.how { display: grid; grid-template-columns: repeat(3,minmax(0,1fr)); gap: 28px; margin: 48px 0 8px; }
+.how h2 { font-size: 15px; font-weight: 600; margin: 0 0 6px; }
+.how p { margin: 0; font-size: 15px; color: var(--muted); text-wrap: pretty; }
+.how b { color: var(--ink); font-weight: 600; }
+.bar { display: flex; flex-wrap: wrap; gap: 12px 20px; align-items: center; justify-content: space-between; margin: 44px 0 14px; }
+.seg { display: inline-flex; background: var(--track); border-radius: 999px; padding: 4px; gap: 2px; }
+.seg button { font: 500 14px var(--sans); color: var(--muted); background: transparent; border: 0; border-radius: 999px; padding: 9px 16px; min-height: 40px; cursor: pointer; }
+.seg button[aria-pressed=true] { background: var(--navy); color: #fff; }
+.seg button:not([aria-pressed=true]):hover { color: var(--ink); }
+.legend { display: flex; gap: 18px; font-size: 13px; color: var(--muted); align-items: center; flex-wrap: wrap; }
+.legend i { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 6px; vertical-align: -1px; }
+.list { background: var(--surface); border-radius: 20px; box-shadow: var(--shadow); padding: 6px 22px 10px; }
+.row { display: grid; grid-template-columns: 96px 200px minmax(0,1fr) 84px 140px; gap: 16px; align-items: center; padding: 12px 0; border-bottom: 1px solid var(--line); font-variant-numeric: tabular-nums; }
+.row:last-child { border-bottom: 0; }
+.row.head { font-size: 13px; color: var(--muted); padding: 14px 0 10px; }
+.row .n { font-weight: 600; } .row .apps { font-size: 14px; color: var(--muted); }
+.row .g { font-family: var(--serif); font-size: 22px; text-align: right; }
+.chip { justify-self: start; font-size: 13px; font-weight: 600; border-radius: 999px; padding: 4px 12px; white-space: nowrap; }
+.chip.look { background: #FBE4E8; color: var(--no); } .chip.ok { background: var(--track); color: var(--muted); }
+.rbox { position: relative; height: 28px; }
+.rbox .one { position: absolute; top: 2px; bottom: 2px; border-left: 1.5px dashed var(--line2); }
+.rbox .ci { position: absolute; top: 12px; height: 4px; border-radius: 2px; }
+.rbox .dot { position: absolute; top: 8px; width: 12px; height: 12px; margin-left: -6px; border-radius: 50%; border: 2px solid #fff; box-shadow: 0 0 0 1px rgba(11,26,51,.08); }
+.axis { position: relative; display: block; height: 18px; font-size: 12px; color: var(--muted); }
+.axis span { position: absolute; transform: translateX(-50%); }
+.note { margin-top: 28px; max-width: 820px; font-size: 14px; color: var(--muted); line-height: 1.6; }
+.note b { color: var(--ink); }
+.caveat { margin-top: 36px; background: var(--input); border-radius: 18px; padding: 24px 26px 14px; max-width: 820px; }
+.caveat h2 { font-family: var(--serif); font-weight: 400; font-size: 26px; margin: 0 0 8px; }
+.caveat p { margin: 0 0 10px; color: var(--muted); } .caveat b { color: var(--ink); }
+code { font: 13px ui-monospace, Menlo, monospace; background: var(--input); padding: 2px 6px; border-radius: 6px; color: var(--ink); }
+.foot { border-top: 1px solid var(--line); margin-top: 56px; padding-top: 22px; font-size: 14px; color: var(--muted); max-width: 820px; }
+@media (max-width: 860px) {
+  .stats, .how { grid-template-columns: minmax(0,1fr); }
+  .row { grid-template-columns: minmax(0,1fr) auto; gap: 6px 12px; }
+  .row .apps { grid-column: 1; grid-row: 2; } .row .rc { grid-column: 1 / -1; } .row .g { grid-row: 1; grid-column: 2; }
+  .row .chip { grid-column: 2; grid-row: 2; justify-self: end; }
+  .row.head { display: none; }
+}
+@media (prefers-reduced-motion: no-preference) { .row { transition: background .15s; } .row:not(.head):hover { background: #F7F9FC; } }
+</style>
+</head>
+<body>
+<header class="top">
+  <div class="wrap" style="padding-bottom:0">
+    <nav class="nav"><a class="brand" href="./"><img src="favicon.svg" alt="">FairView</a><a class="back" href="./">← Same person, different address demo</a></nav>
+    <h1>Which lenders deserve a closer look?</h1>
+    <p class="lede">For each lender, we compare how often it denied Black and white applicants with how often their finances alone would predict. A gap that finances don’t explain is a reason to look closer, not proof of discrimination.</p>
+  </div>
+</header>
+
+<main class="wrap">
+  <section class="stats" aria-label="Summary" id="stats"></section>
+
+  <section class="how" aria-label="How to read this">
+    <div><h2>1 · Raw gap</h2><p>How many times more often the lender denied <b>Black</b> applicants than <b>white</b> ones. Part of this can be explained by income, debts and loan size.</p></div>
+    <div><h2>2 · After finances</h2><p>A model that sees <b>only finances</b> (no race, no neighborhood) predicts each applicant’s chance of denial. We divide each group’s real denials by its predicted ones. <b>1.0×</b> means finances explain the gap.</p></div>
+    <div><h2>3 · Look closer</h2><p>The bar is the 95% range. <b>Look closer</b> means the whole range sits above 1.0×, even after correcting for testing dozens of lenders at once.</p></div>
+  </section>
+
+  <div class="bar">
+    <div class="seg" role="group" aria-label="State" id="state">
+      <button data-k="ga" aria-pressed="true">Georgia</button><button data-k="nc" aria-pressed="false">North Carolina</button>
+    </div>
+    <div class="seg" role="group" aria-label="Show" id="filter">
+      <button data-f="all" aria-pressed="true">All lenders</button><button data-f="look" aria-pressed="false">Look closer</button><button data-f="ok" aria-pressed="false">Not significant</button>
+    </div>
+  </div>
+  <div class="legend" aria-hidden="true"><span><i style="background:var(--no)"></i>Look closer</span><span><i style="background:var(--sky)"></i>Not significant</span><span>Dashed line = 1.0× (finances explain it)</span></div>
+
+  <section class="list" aria-label="Lenders" style="margin-top:14px">
+    <div class="row head"><span>Lender</span><span>Applications</span><span class="axis" id="axis"></span><span style="text-align:right">After finances</span><span></span></div>
+    <div id="rows"></div>
+  </section>
+  <p class="note" id="note"></p>
+
+  <section class="caveat">
+    <h2>What this can and can’t tell you</h2>
+    <p><b>Public mortgage data has no credit scores.</b> A lender whose Black applicants have weaker credit would show a gap here even if it treats everyone the same. So a flag means “pull the files and check,” which is what a fair-lending analyst would do next.</p>
+    <p><b>Lenders are anonymised</b> and numbered by size (Lender 1 = most applications). We only include lenders with at least 50 Black and 50 white applications and 5 denials in each group.</p>
+    <p>An analyst can run the same check on any one lender with <code>python src/audit_lender.py --lei &lt;lender ID&gt;</code>. Method and code: <a href="https://github.com/kabirshah4/race-blind-isnt-fair">github.com/kabirshah4/race-blind-isnt-fair</a>.</p>
+  </section>
+
+  <div class="foot">Data: public HMDA records, CFPB / FFIEC (<a href="https://ffiec.cfpb.gov/data-browser/">ffiec.cfpb.gov</a>), 2022 to train the finances-only model, 2023 to audit. Team KV Gods · Veritas AI High School Hackathon 2026 · Prototype, not legal or financial advice.</div>
+</main>
+
+<script>
+const $ = (id) => document.getElementById(id);
+const MIN = 0.25, MAX = 12, lg = (v) => (Math.log(Math.min(Math.max(v, MIN), MAX)) - Math.log(MIN)) / (Math.log(MAX) - Math.log(MIN)) * 100;
+let D, state = "ga", filter = "all";
+const med = (a) => { const s = [...a].sort((x, y) => x - y), m = s.length >> 1; return s.length % 2 ? s[m] : (s[m - 1] + s[m]) / 2; };
+
+function svgRange(l) {
+  const c = l.flag ? "var(--no)" : "var(--sky)";
+  return `<div class="rbox" role="img" aria-label="Finance-adjusted gap ${l.adjusted.toFixed(2)}×, 95% range ${l.lo.toFixed(2)} to ${l.hi.toFixed(2)}">` +
+    `<span class="one" style="left:${lg(1)}%"></span>` +
+    `<span class="ci" style="left:${lg(l.lo)}%;width:${lg(l.hi) - lg(l.lo)}%;background:${c}"></span>` +
+    `<span class="dot" style="left:${lg(l.adjusted)}%;background:${c}"></span></div>`;
+}
+
+function render() {
+  const S = D[state], L = S.lenders;
+  document.querySelectorAll("#state button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.k === state));
+  document.querySelectorAll("#filter button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.f === filter));
+  const look = L.filter((l) => l.flag).length;
+  $("stats").innerHTML =
+    `<div class="stat"><strong>${L.length}</strong><span>${S.label.split(" ")[0]} ${S.label.split(" ").slice(1).join(" ")} lenders with enough applications to audit</span></div>` +
+    `<div class="stat"><strong>${look} <small style="font-size:22px;color:var(--muted)">(${Math.round(look / L.length * 100)}%)</small></strong><span>have a gap their applicants’ finances don’t explain: look closer</span></div>` +
+    `<div class="stat"><strong>${med(L.map((l) => l.raw)).toFixed(2)}× → ${med(L.map((l) => l.adjusted)).toFixed(2)}×</strong><span>median Black/white denial gap, before → after finances</span></div>`;
+  $("axis").innerHTML = [0.5, 1, 2, 5, 10].map((v) => `<span style="left:${lg(v)}%">${v}×</span>`).join("");
+  const show = L.filter((l) => filter === "all" || (filter === "look") === l.flag);
+  $("rows").innerHTML = show.map((l) =>
+    `<div class="row"><span class="n">${l.name}</span><span class="apps">${l.apps.toLocaleString()} apps · ${l.black_denied}% vs ${l.white_denied}% denied</span>` +
+    `<span class="rc">${svgRange(l)}</span><span class="g">${l.adjusted.toFixed(2)}×</span>` +
+    `<span class="chip ${l.flag ? "look" : "ok"}">${l.flag ? "Look closer" : "Not significant"}</span></div>`).join("") ||
+    `<div class="row"><span>No lenders in this group.</span></div>`;
+  $("note").innerHTML = `${S.label}. Test: ${S.test}. Ranges are drawn on a log scale from 0.25× to 12×.`;
+}
+
+(async () => {
+  try { D = await (await fetch("lenders.json")).json(); }
+  catch (e) { $("rows").innerHTML = '<div class="row">Couldn’t load the lender data. Please refresh.</div>'; return; }
+  $("state").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state = b.dataset.k; render(); } });
+  $("filter").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { filter = b.dataset.f; render(); } });
+  render();
+})();
+</script>
+</body>
+</html>
