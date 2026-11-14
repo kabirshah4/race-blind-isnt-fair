@@ -369,6 +369,10 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   the page walks the same trees in JavaScript. Any number you type gets a live answer.
   Checked: on 2,000 random applicants, 0 decisions differ from Python. Also on Cloudflare:
   https://race-blind-isnt-fair.pages.dev
+- **Where it fails** (`src/failures.py` → `results_failures.md`; the 57-repo blind judge's top suggestion): real
+  failure cases. Misses: 53% of denials, and over half of those were denied for reasons we can't see (credit
+  history etc., from HMDA's denial-reason field). False alarm example: $60K, 18% down, 99%-minority area, bank
+  approved, model A flags it (17%) but not in a white area (10%). Fix costs: +747 white false alarms net, recall 47% → 44%.
 - **Random real applicant button** (the blind judge's top suggestion, to answer "you cherry-picked the example"):
   500 real 2023 Georgia applications drawn at random. For **55 of 500 (11%)**, the typical AI changes its answer
   just because of the address; the fixed AI never does (it can't see the address).

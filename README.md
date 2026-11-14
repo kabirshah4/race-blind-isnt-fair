@@ -37,6 +37,8 @@
 
 **Second state (North Carolina, `src/other_state.py`, `results_nc.md`).** NC 2023 denial rates: white 5.0%, Black 13.7%. Test 1, Georgia models unchanged on NC 2023: A gives 1.95× (1.81–2.08), C gives 1.46× (1.38–1.56). Test 2, the same recipe trained on NC 2022: A 2.09×, B 1.72×, C 1.42× (1.31–1.54); PR-AUC 0.489 / 0.488 / 0.475. The direction of every result repeats, but the gaps are smaller and the fairness rule removes less of the gap than in Georgia.
 
+**Where it fails** (`src/failures.py`, `results_failures.md`). Model A misses 53% of real denials; 53% of those misses were denied for reasons public data can't show (credit history, incomplete or unverifiable applications), using HMDA's own denial-reason field. Swapping only the neighbourhood clears 53% of the 2,718 Black false alarms. Model C newly flags 1,215 bank-approved white applicants (net +747), catches 44% of denials vs 47%, and also lowers Hispanic false alarms (1.61× → 0.96× the white rate).
+
 **Lender audit** (`src/audit_lender.py`, `results_lenders.md`, `results_lenders_nc.md`). A finances-only XGBoost (no race, no neighbourhood) trained on the previous year gives each application an expected denial chance. For each lender: excess = observed ÷ expected denial rate per group, and finance-adjusted gap = Black excess ÷ white excess, with a 200-draw bootstrap range. Lenders need 50+ Black and white applications and 5+ denials per group. Results are anonymised; single-lender reports (`--lei`) are kept out of the repo.
 
 **Demo example.** The demo's applicant is constructed: one of 174 combinations we tested where the address alone flips model A. Model C ignores neighbourhood, so its answer can't change with the address by design. The demo illustrates the result; the evidence is the test-set audit above.
@@ -57,6 +59,7 @@ python src/audit.py           # 5. fairness audit of model A + proxy detective -
 python src/counterfactual.py  # 6. "same person, different address" -> results_counterfactual.md
 python src/other_state.py     #    second-state check, North Carolina -> results_nc.md
 python src/audit_lender.py    #    lender-by-lender audit (anonymised) -> results_lenders.md; add --lei <LEI> for one lender
+python src/failures.py        #    where it fails: misses by the bank's denial reason, address-only false alarms, fix costs by group -> results_failures.md
 python src/charts.py          # 7. charts -> figures/
 python app/app.py             # 8. the demo app -> http://127.0.0.1:7860
 python src/export_models.py   #    export the real models for the live web demo -> docs/models.json
