@@ -78,8 +78,9 @@ def race_group(row):
     return "Other/Joint"
 
 
-def load_year(year: int) -> pd.DataFrame:
-    df = pd.read_csv(RAW / f"ga_{year}.csv", low_memory=False, dtype=str)
+def load_year(year: int, state: str = "ga") -> pd.DataFrame:
+    """Same cleaning for any state; Georgia is the main study, NC is the second-state check."""
+    df = pd.read_csv(RAW / f"{state}_{year}.csv", low_memory=False, dtype=str)
     n0 = len(df)
     keep = (
         (df.lien_status == "1")
@@ -122,7 +123,7 @@ def load_year(year: int) -> pd.DataFrame:
     # leak the answer. We drop these rows (~0.15%).
     has_tract = out.county.notna() & (out.tract_population > 0)
     out = out[(out.income > 0) & out.property_value.notna() & out.dti.notna() & has_tract]
-    print(f"{year}: raw {n0:,} -> scoped {before:,} -> usable {len(out):,} "
+    print(f"{state.upper()} {year}: raw {n0:,} -> scoped {before:,} -> usable {len(out):,} "
           f"| denial rate {1 - out.approved.mean():.1%}")
     return out
 

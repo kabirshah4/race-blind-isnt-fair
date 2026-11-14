@@ -19,7 +19,7 @@ A denial-prediction model trained on **264,340 real Georgia home-purchase applic
 
 ## What we added (beyond 4.2.3)
 
-Real, current data with a **train-on-2022, test-on-2023** split; **three data leaks** found and removed; the proxy detective; a **"same person, different address"** test; a **fairness-constrained model** whose rule was chosen on 2022 validation data only; and **95% bootstrap confidence intervals**.
+Real, current data with a **train-on-2022, test-on-2023** split; a **second-state check in North Carolina**, where we both live; **three data leaks** found and removed; the proxy detective; a **"same person, different address"** test; a **fairness-constrained model** whose rule was chosen on 2022 validation data only; and **95% bootstrap confidence intervals**.
 
 ## How it works
 
@@ -39,12 +39,13 @@ Real, current data with a **train-on-2022, test-on-2023** split; **three data le
 - **Neighbourhood is a major proxy:** a second model can guess race from A's inputs with ROC-AUC **0.88** (0.5 = coin flip). Neighbourhood inputs explain about **56%** of the excess gap; the rest comes through loan-to-value, debt-to-income and loan type.
 - **Same person, different address:** for qualified Black applicants A wrongly flags, changing **only "% minority residents"** in their neighbourhood flips **49%** to approved (16% for white applicants).
 - **The fixes:** dropping neighbourhood inputs costs almost nothing (0.516 → 0.511) and needs no race data, a *less discriminatory alternative*. Adding a fairness constraint cuts the gap to **1.21×** while keeping 97% of the PR-AUC. **Cost:** white false alarms rise from 4.0% to 5.6%.
+- **It holds outside Georgia:** in **North Carolina** (124,302 applications in 2023), the same recipe gives a **2.09×** gap (1.95–2.22), shrinking to 1.72× without neighbourhood data and **1.42×** with the fairness rule. The Georgia model also works on NC unchanged (PR-AUC 0.478 vs. 0.489 trained locally). The bias is smaller in NC, and the fix helps less, so its size depends on the place.
 
-**Limitations.** HMDA has no credit scores. Our labels are past bank decisions, so we measure **disparities, not intent**. Equal false-alarm rates mean unequal precision by group, a known fairness trade-off. Using race in training is legally debated; fix B avoids it. One state, two years. Details are in the Technical appendix.
+**Limitations.** HMDA has no credit scores. Our labels are past bank decisions, so we measure **disparities, not intent**. Equal false-alarm rates mean unequal precision by group, a known fairness trade-off. Using race in training is legally debated; fix B avoids it. Two states, two years. Details are in the Technical appendix.
 
 ## What we'd do next
 
-Repeat the audit across all states and years with lender-level effects, and test it against lenders' real underwriting rules.
+Extend the audit from two states to all 50, add lender-level effects, and test it against lenders' real underwriting rules.
 
 ## Sources
 
