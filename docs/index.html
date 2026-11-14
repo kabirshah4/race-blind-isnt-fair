@@ -301,7 +301,7 @@ function fillForm() {
 }
 
 async function start() {
-  try { const d = await (await fetch("models.json", { credentials: "omit", mode: "cors" })).json(); M = d; NBS = d.neighbourhoods; }
+  try { const d = await (await fetch("models.json")).json(); M = d; NBS = d.neighbourhoods; }
   catch (e) { $("banner").textContent = "Couldn't load the AI models. Please refresh the page."; return; }
   const nbs = Object.keys(NBS);
   $("nb").innerHTML = nbs.map((nb) => `<button data-nb="${nb}" aria-pressed="false">${nb}</button>`).join("");
