@@ -1,0 +1,48 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; color: #FBFBFD; font-family: Inter, sans-serif;
+      background: linear-gradient(180deg,#0A1F45 0%,#123668 45%,#3E6AA8 80%,#A9C1E3 100%); }
+    .s7-aud { position: absolute; left: 180px; right: 180px; top: 110px; opacity: 0; }
+    .s7-k { font-size: 32px; color: #A9C1E3; font-weight: 500; }
+    .s7-h { font-family: "EB Garamond", serif; font-size: 66px; line-height: 1.1; margin-top: 10px; }
+    .s7-h b { font-weight: 600; color: #FFC46B; }
+    .s7-tab { margin-top: 36px; width: 100%; border-collapse: collapse; font-size: 32px; background: rgba(251,251,253,.96); color: #0B1A33; border-radius: 22px; overflow: hidden; }
+    .s7-tab th { text-align: left; font-size: 28px; font-weight: 500; color: #5A6780; padding: 20px 32px 12px; }
+    .s7-tab td { padding: 16px 32px; border-top: 1px solid #E3E7EF; }
+    .s7-tab td.n { font-variant-numeric: tabular-nums; }
+    .s7-flag { display: inline-block; padding: 4px 18px; border-radius: 999px; font-weight: 700; font-size: 28px; }
+    .s7-look { background: #FBE4E8; color: #B4233C; } .s7-ok { background: #E8ECF3; color: #5A6780; }
+    .s7-note { font-size: 28px; color: #FBFBFD; margin-top: 18px; }
+    .s7-end { position: absolute; left: 0; right: 0; top: 230px; text-align: center; font-family: "EB Garamond", serif; font-size: 136px; line-height: 1.02; opacity: 0; }
+    .s7-links { position: absolute; left: 0; right: 0; top: 600px; text-align: center; font-size: 40px; font-weight: 600; opacity: 0; }
+    .s7-links small { display: block; font-size: 30px; font-weight: 400; color: #E8ECF3; margin-top: 18px; }
+    .s7-next { display: block; margin-top: 34px; font-size: 34px; font-weight: 500; color: #FFC46B; }
+    .s7-logo { position: absolute; left: 50%; top: 880px; width: 72px; height: 72px; margin-left: -36px; border-radius: 16px; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="s7" data-width="1920" data-height="1080">
+    <!-- Real rows from results_lenders.md (anonymised): flagged = whole 95% range above 1.0 -->
+    <div class="s7-aud" id="s7-aud" data-hold>
+      <div class="s7-k">For fair-lending analysts: FairView also audits real lenders</div>
+      <div class="s7-h"><b>30 of 60</b> Georgia lenders have a Black/white denial gap the finances we can see don’t explain.</div>
+      <table class="s7-tab">
+        <tr><th>Lender (anonymised)</th><th>Raw gap</th><th>After finances</th><th></th></tr>
+        <tr><td>Lender 5</td><td class="n">3.66×</td><td class="n">3.01×</td><td><span class="s7-flag s7-look">Look closer</span></td></tr>
+        <tr><td>Lender 1</td><td class="n">2.97×</td><td class="n">1.62×</td><td><span class="s7-flag s7-look">Look closer</span></td></tr>
+        <tr><td>Lender 6</td><td class="n">1.76×</td><td class="n">1.11×</td><td><span class="s7-flag s7-ok">Not significant</span></td></tr>
+      </table>
+      <div class="s7-note">No credit scores in public data, so a flag means “look closer,” not proof.</div>
+    </div>
+    <div class="s7-end" id="s7-end">Race-blind isn’t<br>automatically fair.</div>
+    <div class="s7-links" id="s7-links">fairview-ai.pages.dev<small>github.com/kabirshah4/race-blind-isnt-fair · Team KV Gods · Prototype, not financial advice</small><span class="s7-next">Next: add credit-score data and test all 50 states</span></div>
+    <img class="s7-logo" id="s7-logo" data-hold src="assets/logo.svg" alt="" />
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s7-aud", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.3)
+      .to("#s7-aud", { opacity: 0, y: -16, duration: 0.4 }, 6.6)
+      .fromTo("#s7-end", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 1.0, ease: "power3.out" }, 6.9)
+      .fromTo("#s7-links", { opacity: 0 }, { opacity: 1, duration: 0.8 }, 7.1)
+      .fromTo("#s7-logo", { opacity: 0 }, { opacity: 1, duration: 0.8 }, 7.4);
+    window.__timelines["s7"] = tl;
+  </script>
+</template>

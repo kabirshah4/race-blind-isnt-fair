@@ -13,3 +13,10 @@ checklist.html
 Hackathon-Checklist.pdf
 notebooks/
 reports/
+
+# demo video: keep the source, not generated files
+video-demo/assets/*.webm
+video-demo/.hyperframes/
+video-demo/renders/
+video-demo-prompter/
+VIDEO-SCRIPT.md

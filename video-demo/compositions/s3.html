@@ -1,0 +1,57 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #FBFBFD; color: #0B1A33; font-family: Inter, sans-serif; }
+    .s3-k { position: absolute; left: 180px; top: 150px; font-size: 32px; color: #5A6780; font-weight: 500; opacity: 0; }
+    .s3-h { position: absolute; left: 180px; top: 210px; width: 1560px; font-family: "EB Garamond", serif; font-size: 84px; line-height: 1.08; opacity: 0; }
+    .s3-bars { position: absolute; left: 180px; top: 500px; width: 1560px; opacity: 0; }
+    .s3-row { display: grid; grid-template-columns: 520px 1fr; align-items: center; gap: 30px; margin-bottom: 44px; }
+    .s3-lab { font-size: 34px; font-weight: 500; }
+    .s3-lab small { display: block; font-size: 28px; color: #5A6780; font-weight: 400; margin-top: 4px; }
+    .s3-track { position: relative; height: 72px; }
+    .s3-bar { position: absolute; left: 0; top: 0; bottom: 0; border-radius: 10px; transform-origin: left center; }
+    .s3-val { position: absolute; top: 50%; transform: translateY(-50%); font-family: "EB Garamond", serif; font-size: 60px; }
+    .s3-x { position: absolute; right: 180px; top: 470px; text-align: right; opacity: 0; }
+    .s3-x b { display: block; font-family: "EB Garamond", serif; font-weight: 400; font-size: 260px; line-height: 1; color: #B4233C; }
+    .s3-x span { font-size: 32px; color: #5A6780; }
+    .s3-people { position: absolute; left: 180px; top: 900px; font-size: 40px; opacity: 0; }
+    .s3-people b { color: #B4233C; }
+  </style>
+  <div id="root" data-composition-id="s3" data-width="1920" data-height="1080">
+    <div class="s3-k" id="s3-k">What we found in 264,340 real Georgia home-loan applications (public CFPB data, 2022–2023)</div>
+    <div class="s3-h" id="s3-h1">The AI works: it predicts bank denials better than the classic 43% debt rule.</div>
+    <div class="s3-bars" id="s3-b1">
+      <div class="s3-row"><div class="s3-lab">Classic rule<small>deny if debts &gt; 43% of income</small></div>
+        <div class="s3-track"><div class="s3-bar" id="s3-r1" style="width:662px;background:#D5DBE6"></div><div class="s3-val" style="left:690px">0.34</div></div></div>
+      <div class="s3-row"><div class="s3-lab">Our race-blind AI<small>XGBoost, 17 inputs</small></div>
+        <div class="s3-track"><div class="s3-bar" id="s3-r2" style="width:1000px;background:#0B2A5B"></div><div class="s3-val" style="left:1028px">0.52</div></div></div>
+      <div style="font-size:28px;color:#5A6780">Score: PR-AUC on 117,547 applications from 2023 (higher is better)</div>
+    </div>
+    <div class="s3-h" id="s3-h2">But among people the bank approved, it wrongly flags Black applicants far more often.</div>
+    <div class="s3-bars" id="s3-b2" style="width:1000px">
+      <div class="s3-row" style="grid-template-columns:330px 1fr"><div class="s3-lab">Black applicants<small>the bank approved</small></div>
+        <div class="s3-track"><div class="s3-bar" id="s3-r3" style="width:540px;background:#B4233C"></div><div class="s3-val" style="left:566px">12.0%</div></div></div>
+      <div class="s3-row" style="grid-template-columns:330px 1fr"><div class="s3-lab">White applicants<small>the bank approved</small></div>
+        <div class="s3-track"><div class="s3-bar" id="s3-r4" style="width:180px;background:#A9C1E3"></div><div class="s3-val" style="left:206px">4.0%</div></div></div>
+      <div style="font-size:28px;color:#5A6780">Share flagged “likely denied” by the AI</div>
+    </div>
+    <div class="s3-x" id="s3-x"><b>3.0×</b><span>as often</span></div>
+    <div class="s3-people" id="s3-people" data-hold><b>2,718</b> Black Georgians the bank approved would be flagged in a year, about 1,800 more than at the white rate.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s3-k", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.2)
+      .fromTo("#s3-h1", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.4)
+      .fromTo("#s3-b1", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 1.4)
+      .fromTo("#s3-r1", { scaleX: 0 }, { scaleX: 1, duration: 0.9, ease: "power3.out" }, 1.5)
+      .fromTo("#s3-r2", { scaleX: 0 }, { scaleX: 1, duration: 1.1, ease: "power3.out" }, 2.3)
+      .to(["#s3-h1", "#s3-b1"], { opacity: 0, duration: 0.4 }, 6.2)
+      .fromTo("#s3-h2", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 6.6)
+      .fromTo("#s3-b2", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 7.4)
+      .fromTo("#s3-r3", { scaleX: 0 }, { scaleX: 1, duration: 1.0, ease: "power3.out" }, 7.5)
+      .fromTo("#s3-r4", { scaleX: 0 }, { scaleX: 1, duration: 0.8, ease: "power3.out" }, 8.1)
+      .fromTo("#s3-x", { opacity: 0, scale: 0.9 }, { opacity: 1, scale: 1, duration: 0.7, ease: "power3.out" }, 9.4)
+      .fromTo("#s3-people", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7 }, 10.0)
+      .to(["#s3-k", "#s3-h2", "#s3-b2", "#s3-x", "#s3-people"], { opacity: 0, duration: 0.4 }, 15.5);
+    window.__timelines["s3"] = tl;
+  </script>
+</template>

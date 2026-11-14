@@ -1,0 +1,45 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #FBFBFD; color: #0B1A33; font-family: Inter, sans-serif; }
+    .s2-k { position: absolute; left: 180px; top: 150px; font-size: 32px; color: #5A6780; font-weight: 500; opacity: 0; }
+    .s2-big { position: absolute; left: 180px; width: 1560px; font-family: "EB Garamond", serif; font-size: 96px; line-height: 1.08; opacity: 0; }
+    #s2-a { top: 230px; } #s2-b { top: 380px; color: #2C5AA0; font-style: italic; }
+    #s2-c { top: 230px; }
+    .s2-houses { position: absolute; left: 180px; top: 440px; display: flex; gap: 120px; opacity: 0; }
+    .s2-blk { display: grid; grid-template-columns: repeat(5, 92px); gap: 18px; }
+    .s2-blk div { width: 92px; height: 92px; clip-path: polygon(50% 0, 100% 42%, 100% 100%, 0 100%, 0 42%); }
+    .s2-cap { font-size: 30px; color: #5A6780; margin-top: 22px; }
+    .s2-data { position: absolute; left: 180px; width: 1560px; top: 790px; font-size: 40px; opacity: 0; }
+    .s2-data { font-family: "EB Garamond", serif; font-size: 60px; } .s2-data b { color: #B4233C; font-weight: 600; }
+    .s2-data small { display: block; font-size: 30px; color: #5A6780; margin-top: 6px; }
+  </style>
+  <div id="root" data-composition-id="s2" data-width="1920" data-height="1080">
+    <div class="s2-k" id="s2-k">The problem</div>
+    <div class="s2-big" id="s2-a">Banks use AI to approve mortgages.</div>
+    <div class="s2-big" id="s2-b">“It’s fair: it never sees race.”</div>
+    <div class="s2-big" id="s2-c">But where you live is closely tied to race.</div>
+    <div class="s2-houses" id="s2-houses">
+      <div><div class="s2-blk">
+        <div style="background:#A9C1E3"></div><div style="background:#A9C1E3"></div><div style="background:#A9C1E3"></div><div style="background:#0B2A5B"></div><div style="background:#A9C1E3"></div>
+        <div style="background:#A9C1E3"></div><div style="background:#A9C1E3"></div><div style="background:#A9C1E3"></div><div style="background:#A9C1E3"></div><div style="background:#A9C1E3"></div>
+      </div><div class="s2-cap">Mostly white neighborhood</div></div>
+      <div><div class="s2-blk">
+        <div style="background:#0B2A5B"></div><div style="background:#0B2A5B"></div><div style="background:#0B2A5B"></div><div style="background:#0B2A5B"></div><div style="background:#0B2A5B"></div>
+        <div style="background:#0B2A5B"></div><div style="background:#A9C1E3"></div><div style="background:#0B2A5B"></div><div style="background:#0B2A5B"></div><div style="background:#0B2A5B"></div>
+      </div><div class="s2-cap">Mostly minority neighborhood</div></div>
+    </div>
+    <div class="s2-data" id="s2-data" data-hold>Denying loans because of a neighborhood’s racial makeup is <b>redlining</b>, illegal since 1968.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#s2-k", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 0.2)
+      .fromTo("#s2-a", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.3)
+      .fromTo("#s2-b", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 2.0)
+      .to(["#s2-a", "#s2-b"], { opacity: 0, duration: 0.4 }, 4.6)
+      .fromTo("#s2-c", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 5.0)
+      .fromTo("#s2-houses", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 5.6)
+      .fromTo("#s2-data", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7 }, 7.0)
+      .to(["#s2-k", "#s2-c", "#s2-houses", "#s2-data"], { opacity: 0, duration: 0.4 }, 11.5);
+    window.__timelines["s2"] = tl;
+  </script>
+</template>

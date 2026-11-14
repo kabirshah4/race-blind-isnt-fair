@@ -1,0 +1,50 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #FBFBFD; color: #0B1A33; font-family: Inter, sans-serif; }
+    .ex-k { position: absolute; left: 160px; top: 110px; font-size: 32px; color: #5A6780; font-weight: 500; opacity: 0; }
+    .ex-card { position: absolute; left: 160px; top: 180px; width: 700px; padding: 44px 52px; border-radius: 28px; background: #fff;
+      box-shadow: 0 1px 2px rgba(11,26,51,.05), 0 30px 60px -24px rgba(11,26,51,.22); opacity: 0; }
+    .ex-name { font-family: "EB Garamond", serif; font-size: 76px; line-height: 1; }
+    .ex-note { font-size: 28px; color: #5A6780; margin-top: 10px; }
+    .ex-row { display: flex; justify-content: space-between; font-size: 34px; padding: 16px 0; border-bottom: 1px solid #E3E7EF; }
+    .ex-row:first-of-type { margin-top: 26px; }
+    .ex-row span { color: #5A6780; } .ex-row b { font-weight: 600; }
+    .ex-race { margin-top: 22px; font-size: 30px; color: #2C5AA0; font-weight: 600; }
+    .ex-addr { position: absolute; left: 960px; width: 800px; padding: 34px 40px; border-radius: 24px; background: #fff; opacity: 0;
+      box-shadow: 0 1px 2px rgba(11,26,51,.05), 0 24px 50px -24px rgba(11,26,51,.2); }
+    #ex-a1 { top: 220px; } #ex-a2 { top: 500px; }
+    .ex-where { font-size: 30px; color: #5A6780; }
+    .ex-place { font-family: "EB Garamond", serif; font-size: 52px; margin-top: 6px; }
+    .ex-stamp { display: inline-block; margin-top: 18px; padding: 8px 22px; border-radius: 999px; font-size: 36px; font-weight: 700; letter-spacing: .04em; }
+    .ex-ok { background: #E3F4EC; color: #127A5B; } .ex-no { background: #FBE4E8; color: #B4233C; }
+    .ex-ai { font-size: 28px; color: #5A6780; margin-left: 16px; }
+    .ex-line { position: absolute; left: 160px; right: 160px; top: 900px; text-align: center; font-family: "EB Garamond", serif; font-size: 64px; opacity: 0; }
+  </style>
+  <div id="root" data-composition-id="ex" data-width="1920" data-height="1080">
+    <div class="ex-k" id="ex-k">An example</div>
+    <div class="ex-card" id="ex-card">
+      <div class="ex-name">Meet Maya</div>
+      <div class="ex-note">a made-up applicant · the answers are from the real AI</div>
+      <div class="ex-row"><span>Income</span><b>$60,000 a year</b></div>
+      <div class="ex-row"><span>Home price</span><b>$125,000</b></div>
+      <div class="ex-row"><span>Down payment</span><b>$25,000 (20%)</b></div>
+      <div class="ex-row"><span>Debts</span><b>42% of income</b></div>
+      <div class="ex-race">The AI is never told her race.</div>
+    </div>
+    <div class="ex-addr" id="ex-a1"><div class="ex-where">Her home is in a</div><div class="ex-place">mostly white neighborhood</div>
+      <span class="ex-stamp ex-ok">APPROVE</span><span class="ex-ai">predicts a bank-style AI</span></div>
+    <div class="ex-addr" id="ex-a2"><div class="ex-where">Same Maya, same money. Her home is in a</div><div class="ex-place">mostly minority neighborhood</div>
+      <span class="ex-stamp ex-no">DENY</span><span class="ex-ai">predicts the same AI</span></div>
+    <div class="ex-line" id="ex-line" data-hold>Only the address changed.</div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    tl.fromTo("#ex-k", { opacity: 0 }, { opacity: 1, duration: 0.4 }, 0.2)
+      .fromTo("#ex-card", { opacity: 0, y: 30 }, { opacity: 1, y: 0, duration: 0.8, ease: "power3.out" }, 0.3)
+      .fromTo("#ex-a1", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 3.6)
+      .fromTo("#ex-a2", { opacity: 0, x: 40 }, { opacity: 1, x: 0, duration: 0.7, ease: "power3.out" }, 6.4)
+      .fromTo("#ex-line", { opacity: 0, y: 16 }, { opacity: 1, y: 0, duration: 0.7 }, 9.0)
+      .to(["#ex-k", "#ex-card", "#ex-a1", "#ex-a2", "#ex-line"], { opacity: 0, duration: 0.4 }, 11.5);
+    window.__timelines["ex"] = tl;
+  </script>
+</template>

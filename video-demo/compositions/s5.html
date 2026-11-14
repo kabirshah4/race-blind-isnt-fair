@@ -1,0 +1,30 @@
+<template>
+  <style>
+    #root { position: absolute; inset: 0; overflow: hidden; background: #FBFBFD; font-family: Inter, sans-serif; }
+    #s5-vid { position: absolute; inset: 0; width: 1920px; height: 1080px; object-fit: cover; }
+    .s5-cap { position: absolute; left: 96px; bottom: 72px; max-width: 1100px; padding: 22px 34px; border-radius: 18px;
+      background: rgba(11,26,51,.92); color: #FBFBFD; font-size: 36px; font-weight: 500; line-height: 1.3; opacity: 0; }
+    .s5-veil { position: absolute; inset: 0; background: rgba(11,26,51,.78); opacity: 0; }
+    .s5-big { position: absolute; left: 180px; right: 180px; top: 330px; color: #FBFBFD; text-align: center; opacity: 0; }
+    .s5-big b { display: block; font-family: "EB Garamond", serif; font-weight: 400; font-size: 200px; line-height: 1; }
+    .s5-big span { display: block; font-size: 46px; margin-top: 28px; line-height: 1.3; }
+    .s5-big small { display: block; font-size: 28px; margin-top: 22px; color: #A9C1E3; }
+  </style>
+  <div id="root" data-composition-id="s5" data-width="1920" data-height="1080">
+    <video id="s5-vid" class="clip" src="assets/demo_random.webm" data-start="0" data-duration="17" data-media-start="1.6" data-track-index="0" muted playsinline></video>
+    <div class="s5-cap" id="s5-c1" data-layout-allow-overlap>Maya is made up. These are <b>real</b> 2023 applicants</div>
+    <div class="s5-cap" id="s5-c2" data-layout-allow-overlap>Most real applicants get the same answer at any address</div>
+    <div class="s5-cap" id="s5-c3" data-layout-allow-overlap>Real applicant #370: $100K, 24% down, bank approved. Minority area: <b style="color:#FF8A9B">deny</b></div>
+    <div class="s5-veil" id="s5-veil" data-layout-allow-overlap></div>
+    <div class="s5-big" id="s5-big" data-layout-allow-overlap><b>1 in 9</b><span>real applicants get a different answer because of their address</span><small>55 of 500 · our fixed AI: 0</small></div>
+  </div>
+  <script>
+    const tl = gsap.timeline({ paused: true });
+    const show = (id, a, b) => tl.fromTo(id, { opacity: 0, y: 12 }, { opacity: 1, y: 0, duration: 0.3 }, a).to(id, { opacity: 0, duration: 0.25 }, b);
+    show("#s5-c1", 0.2, 2.9); show("#s5-c2", 3.3, 6.2); show("#s5-c3", 6.6, 10.7);
+    tl.fromTo("#s5-veil", { opacity: 0 }, { opacity: 1, duration: 0.5 }, 11.9)
+      .fromTo("#s5-big", { opacity: 0, y: 24 }, { opacity: 1, y: 0, duration: 0.7, ease: "power3.out" }, 12.1)
+      .to(["#s5-veil", "#s5-big"], { opacity: 0, duration: 0.4 }, 16.5);
+    window.__timelines["s5"] = tl;
+  </script>
+</template>

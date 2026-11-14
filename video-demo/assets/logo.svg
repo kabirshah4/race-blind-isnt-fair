@@ -1,0 +1,6 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- FairView: a house with an equals sign inside (same answer, any address) -->
+  <rect width="64" height="64" rx="14" fill="#0B2A5B"/>
+  <path d="M14 30 L32 15 L50 30 V49 H14 Z" fill="none" stroke="#FBFBFD" stroke-width="4.5" stroke-linejoin="round"/>
+  <path d="M24 34 H40 M24 42 H40" stroke="#A9C1E3" stroke-width="4.5" stroke-linecap="round"/>
+</svg>
