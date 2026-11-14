@@ -93,11 +93,14 @@ def main():
 
     # 3. Where the fix backfires
     w = approved[approved.race_group == "White"]
+    bk = approved[approved.race_group == "Black"]
     new_w = w[w.fc & ~w.fa]
     rec_a, rec_c = denied.fa.mean(), denied.fc.mean()
     out += ["", "## 3. Where the fix backfires", "",
             f"- Model C newly flags **{len(new_w):,}** white applicants the bank approved and stops flagging "
             f"{(w.fa & ~w.fc).sum():,} others: a net **{w.fc.sum() - w.fa.sum():+,}** (white false alarms {w.fa.mean():.1%} → {w.fc.mean():.1%}).",
+            f"- For Black applicants the bank approved, model C stops flagging **{(bk.fa & ~bk.fc).sum():,}** and newly flags "
+            f"{(bk.fc & ~bk.fa).sum():,}: a net **{bk.fa.sum() - bk.fc.sum():,} fewer** (false alarms {bk.fa.mean():.1%} → {bk.fc.mean():.1%}).",
             f"- Model C catches **{rec_c:.0%}** of real denials vs **{rec_a:.0%}** for model A.", "",
             "False-alarm rate (bank-approved applicants flagged), by group:", "",
             "| group | applicants | model A | model C | vs white (A → C) |", "|---|---|---|---|---|"]

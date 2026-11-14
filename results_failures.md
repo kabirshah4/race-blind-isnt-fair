@@ -26,6 +26,7 @@ Model A flags **2,718** Black applicants the bank approved. Moving them, on pape
 ## 3. Where the fix backfires
 
 - Model C newly flags **1,215** white applicants the bank approved and stops flagging 468 others: a net **+747** (white false alarms 4.0% → 5.6%).
+- For Black applicants the bank approved, model C stops flagging **1,544** and newly flags 353: a net **1,191 fewer** (false alarms 12.0% → 6.8%).
 - Model C catches **44%** of real denials vs **47%** for model A.
 
 False-alarm rate (bank-approved applicants flagged), by group:

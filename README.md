@@ -7,7 +7,7 @@
 *This project is a prototype and is not financial advice.*
 
 > ## In 10 seconds
-> **A mortgage AI built the way lenders build them, never shown race, still wrongly flagged bank-approved Black applicants about 3× as often as white ones**, mostly through neighbourhood data. We measured it on 264,340 real Georgia applications, confirmed it in North Carolina, cut the gap to 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps the finances we can see don't explain (30 of 60 in Georgia; a lead, not proof).
+> **A mortgage AI trained on lenders' past decisions (public data, so no credit scores), never shown race, still wrongly flagged bank-approved Black applicants about 3× as often as white ones**, mostly through neighbourhood data. We measured it on 264,340 real Georgia applications, confirmed it in North Carolina, cut the gap to 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps the finances we can see don't explain (30 of 60 in Georgia; a lead, not proof).
 >
 > - **Try it live:** [fairview-ai.pages.dev](https://fairview-ai.pages.dev) (same person, switch only the address; works on phones)
 > - **The finding:** 2,718 bank-approved Black Georgians wrongly flagged by a race-blind model (stable across 5 retrains: 2.85–2.95×); neighbourhood explains ~56% of the excess gap

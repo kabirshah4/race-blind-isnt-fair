@@ -47,6 +47,7 @@ Real 2023 cases (rounded; all in `results_failures.md`):
 - **It misses half of real denials (53%)**, and **53%** of those misses were denied for reasons public data can't show (credit history, incomplete or unverifiable applications). *Example:* $150K income, 18% down, debts 33% of income: our model says 2% risk; the bank denied it for credit history.
 - **The address alone flags people.** *Example:* $60K income, 18% down, in a 99%-minority neighbourhood. The bank approved it; model A flags it (17%). The same file in a mostly white area: 10%, not flagged. Swapping only the neighbourhood clears **53%** of the 2,718 Black false alarms.
 - **The fix has costs.** Model C newly flags **1,215** white applicants the bank approved (net +747) and catches 44% of denials vs 47%. It was tuned for Black vs white only; it also lowers Hispanic false alarms (1.61× → 0.96× the white rate).
+- **The verdict depends on the fairness measure.** We use false alarms; by precision, model A looks *better* for Black applicants (44.7% vs 37.8%), and C widens that gap. Both can't be equal at once.
 - We measure **disparities, not intent**. Fix C uses race in training (legally debated under ECOA); fix B needs none, so it is the safer choice for a real lender. Two states, two years.
 
 ## What we'd do next
