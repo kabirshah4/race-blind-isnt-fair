@@ -3,8 +3,6 @@
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
 /lenders.json
   Cache-Control: public, max-age=3600, stale-while-revalidate=86400
-/FairView-Demo.mp4
-  Cache-Control: public, max-age=86400
 /*.svg
   Cache-Control: public, max-age=86400
 /*.jpg

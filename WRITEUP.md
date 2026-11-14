@@ -1,7 +1,7 @@
 # FairView · Race-Blind Isn't Fair
 
 **Track:** Finance · **Team:** KV Gods (Kabir Shah, Vishnu Veer)
-**Live demo:** https://fairview-ai.pages.dev · **Demo video (2 min):** https://fairview-ai.pages.dev/FairView-Demo.mp4 · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair · **Details:** [TECHNICAL.md](TECHNICAL.md)
+**Live demo:** https://fairview-ai.pages.dev · **Demo video (2 min):** https://www.youtube.com/watch?v=ThfnVjNuL9M · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair · **Details:** [TECHNICAL.md](TECHNICAL.md)
 
 *This project is a prototype and is not financial advice.*
 

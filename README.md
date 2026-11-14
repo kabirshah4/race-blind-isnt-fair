@@ -7,7 +7,7 @@
 *This project is a prototype and is not financial advice.*
 
 > ## In 10 seconds
-> [![Watch the 2-minute demo video](docs/video-thumbnail.jpg)](https://fairview-ai.pages.dev/FairView-Demo.mp4)
+> [![Watch the 2-minute demo video](docs/video-thumbnail.jpg)](https://www.youtube.com/watch?v=ThfnVjNuL9M)
 >
 > **A mortgage AI trained on lenders' past decisions (public data, so no credit scores), never shown race, still wrongly flagged bank-approved Black applicants about 3× as often as white ones**, largely through neighbourhood data. We measured it on 264,340 real Georgia applications, repeated it in North Carolina, cut the gap to about 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps the finances we can see don't explain (30 of 60 in Georgia; a lead, not proof).
 >
