@@ -5,6 +5,10 @@
 
 *This project is a prototype and is not financial advice.*
 
+## Why we care
+
+Both of our families are Indian immigrants, and we don't want our parents' race to affect whether they can buy a home. So we checked the real data. In Georgia in 2023, banks denied Asian Indian applicants **10.8%** of the time vs. **5.8%** for white applicants (before accounting for finances). When we built an AI that never sees race, it didn't wrongly flag qualified Asian Indian applicants more often, but it did wrongly flag qualified **Black** applicants **3×** as often. A bias you can't see can hit any family, so it has to be checked.
+
 ## The problem
 
 Lenders increasingly use machine learning to approve mortgages, and a common defence is that the model "never sees race." But where you live is closely tied to race, so a model can rebuild redlining (outlawed in 1968) without anyone writing it in. We built a race-blind mortgage model and tested whether it treats Black and white applicants differently. Our users are **fair-lending auditors and community groups** checking a lender's model.
