@@ -258,7 +258,7 @@ function card(m) {
     <div class="verdict"><span class="dot"></span>${bad ? "Would deny" : "Would approve"}</div>
     <div class="mk">Chance this AI says deny: <b>${pct(r)}</b></div>
     <div class="meter"><div class="fill" style="transform:scaleX(${fill.toFixed(3)})"></div><div class="tick" style="left:${tick.toFixed(1)}%"></div></div>
-    <div class="scale"><span>0%</span><span class="tl" style="left:${tick.toFixed(1)}%">denies above ${pct(cut)}</span></div>
+    <div class="scale">${tick < 28 ? "" : "<span>0%</span>"}<span class="tl" style="left:${tick.toFixed(1)}%;transform:translateX(${tick < 28 ? "-1px" : tick > 72 ? "-100%" : "-50%"})">denies above ${pct(cut)}</span></div>
     ${bad ? `<div class="fix"><small>What would change its mind?</small><div>${advice(m.key, state)}</div></div>` : ""}
   </article>`;
 }
