@@ -19,8 +19,9 @@ explain every line of this to a judge. Newest entries are at the bottom.
 > through hidden "stand-in" features like the neighbourhood someone lives in.
 > Then we tried to fix it, and we measured what the fix costs.
 
-**Who it helps:** a first-time home buyer who got denied and wants to know why,
-and a community group or regulator checking whether a lending model is fair.
+**Who it helps:** a fair-lending analyst at a housing nonprofit or state regulator, deciding
+whether a lender's "race-blind" model, or the lender itself, deserves a closer look. (Early on we
+also had home buyers in mind; we narrowed to one user so the tool is designed around one job.)
 
 **Background you need to know:**
 - **Redlining:** for decades, banks refused loans in Black neighbourhoods. It

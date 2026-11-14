@@ -176,6 +176,7 @@ input[type=range] { width: 100%; accent-color: var(--navy); min-height: 32px; }
     qualified white applicants; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score. The trade-off: qualified
     white applicants are flagged a little more often (4.0% → 5.6%).<br>
     Both AIs run live in your browser: these are the exact trained XGBoost models (every decision tree), exported from Python and checked to give identical answers.
+    Data: public HMDA mortgage records from the CFPB / FFIEC (<a href="https://ffiec.cfpb.gov/data-browser/">ffiec.cfpb.gov</a>). Built with pandas, scikit-learn, XGBoost and fairlearn; Claude Code helped write code and review methods.
     Code, data pipeline and write-up: <a href="https://github.com/kabirshah4/race-blind-isnt-fair">github.com/kabirshah4/race-blind-isnt-fair</a>.<br>
     Team KV Gods · Veritas AI High School Hackathon 2026 · Prototype, not financial advice.
   </div>

@@ -352,6 +352,7 @@ with gr.Blocks(title="FairView") as demo:
       What matters is the result across all 117,547 real 2023 applications: the typical AI wrongly flagged qualified Black applicants
       <b>3.0×</b> as often as qualified white applicants; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score.
       The trade-off: qualified white applicants are flagged a little more often (4.0% → 5.6%).<br>
+      Data: public HMDA records from the CFPB / FFIEC (ffiec.cfpb.gov). Built with pandas, scikit-learn, XGBoost, fairlearn and Gradio; Claude Code helped write code.<br>
       Prototype built for the Veritas AI High School Hackathon. Not financial advice.</div>""")
 
     fields = [income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant, neighbourhood]
