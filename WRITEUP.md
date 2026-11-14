@@ -7,25 +7,25 @@
 
 ## Why we care
 
-Both of our families immigrated from India, and our parents went through the process of buying a home. We wanted to know whether something besides their finances, like their race, could quietly affect that decision for families like ours. So we checked the real data. In Georgia in 2023, banks denied Asian Indian applicants **10.8%** of the time vs. **5.8%** for white applicants (before accounting for finances). When we built an AI that never sees race, it didn't wrongly flag qualified Asian Indian applicants more often, but it did wrongly flag qualified **Black** applicants **3×** as often. A bias you can't see can hit any family, so it has to be checked.
+Both of our families immigrated from India, and our parents went through buying a home. We wanted to know whether something besides their finances, like race, could quietly affect that decision. In Georgia's 2023 data, banks denied Asian Indian applicants 10.8% of the time vs. 5.8% for white applicants (before accounting for finances). Our race-blind AI didn't over-flag qualified Asian Indian applicants, but it did wrongly flag qualified **Black** applicants **3×** as often. A bias you can't see can hit any family, so it has to be checked.
 
 ## The problem
 
-Lenders increasingly use machine learning to approve mortgages, and a common defence is that the model "never sees race." But where you live is closely tied to race, so a model can rebuild redlining (outlawed in 1968) without anyone writing it in. We built a race-blind mortgage model and tested whether it treats Black and white applicants differently. Our user is **a fair-lending analyst at a housing nonprofit or state regulator** who has a lender's public HMDA file and must decide whether a "race-blind" model deserves a closer look.
+Lenders use machine learning to approve mortgages and often defend it because the model "never sees race." But where you live is closely tied to race, so a model can rebuild redlining (outlawed in 1968) without anyone writing it in. Our user is **a fair-lending analyst at a housing nonprofit or state regulator** deciding whether a lender's "race-blind" model, or the lender itself, deserves a closer look.
 
 ## What we built
 
-A denial-prediction model built on **264,340 real Georgia home-purchase applications** (trained on 146,793 from 2022, tested on 117,547 from 2023) (public HMDA data) that never sees race, sex or age; a **fairness audit** of its mistakes by group; a **"proxy detective"** that shows which inputs carry race; two **fixes** with their costs; and a **demo app** where you change only an applicant's neighbourhood and compare the original model with the fixed one.
+A denial-prediction model built on **264,340 real Georgia home-purchase applications** (public HMDA data; trained on 146,793 from 2022, tested on 117,547 from 2023) that never sees race, sex or age; a **fairness audit** of its mistakes by group; a **"proxy detective"** that shows which inputs carry race; two **fixes** with their costs; a **lender-audit tool** an analyst can run on any lender; and a **demo app** where you change only an applicant's address.
 
 ## What we added (beyond 4.2.3)
 
-Real, current data with a **train-on-2022, test-on-2023** split; a **second-state check in North Carolina**, where we both live; **three data leaks** found and removed; the proxy detective; a **"same person, different address"** test; a **fairness-constrained model** whose rule was chosen on 2022 validation data only; and **95% bootstrap confidence intervals**.
+Real, current data with a time-based split; a **second-state check in North Carolina**, where we live; **three data leaks** found and removed; the proxy detective; a **"same person, different address"** test; a fairness rule chosen on 2022 validation data only; bootstrap confidence intervals; and a **lender-by-lender audit** separating gaps explained by finances from gaps that aren't.
 
 ## How it works
 
-**Data:** Georgia home-purchase applications that were approved or denied (146,793 in 2022, 117,547 in 2023; 9.8% denied). **Leaks removed:** columns that only exist after a decision (interest rate, costs), rows with missing addresses, and two columns that gave the answer away (`preapproval`, `initially_payable_to_institution`). **Model:** XGBoost on 17 inputs (income, loan, home value, loan-to-value, debt-to-income, loan type, plus 7 neighbourhood statistics). **Fairness measure:** the *false-alarm rate*, meaning the share of applicants the bank approved that the model flags as "likely denied," compared between Black and white applicants.
+**Model:** XGBoost on 17 inputs (income, loan, home value, loan-to-value, debt-to-income, loan type, plus 7 neighbourhood statistics). **Leaks removed:** columns only filled in after a decision, rows with missing addresses, and two columns that gave the answer away. **Fairness measure:** the *false-alarm rate*, the share of applicants the bank approved that the model flags as "likely denied," compared between Black and white applicants.
 
-## Results (2023 test data, 117,547 applications)
+## Results (2023 test data)
 
 | Model | PR-AUC | Black vs. white false alarms (95% CI) |
 |---|---|---|
@@ -35,17 +35,17 @@ Real, current data with a **train-on-2022, test-on-2023** split; a **second-stat
 | C. B + fairness constraint (race used only in training) | 0.501 | **1.21×** (1.14–1.27) |
 
 - **The model works:** 1.5× the PR-AUC of the classic lending rule.
-- **Race-blind, yet unfair:** model A wrongly flags **12.0%** of qualified Black applicants vs. **4.0%** of qualified white applicants.
-- **Neighbourhood is a major proxy:** a second model can guess race from A's inputs with ROC-AUC **0.88** (0.5 = coin flip). Neighbourhood inputs explain about **56%** of the excess gap; the rest comes through loan-to-value, debt-to-income and loan type.
-- **Same person, different address:** for qualified Black applicants A wrongly flags, changing **only "% minority residents"** in their neighbourhood flips **49%** to approved (16% for white applicants).
-- **The fixes:** dropping neighbourhood inputs costs almost nothing (0.516 → 0.511) and needs no race data, a *less discriminatory alternative*. Adding a fairness constraint cuts the gap to **1.21×** while keeping 97% of the PR-AUC. **Cost:** white false alarms rise from 4.0% to 5.6%.
-- **It holds outside Georgia:** in **North Carolina** (124,302 applications in 2023), the same recipe gives a **2.09×** gap (1.95–2.22), shrinking to 1.72× without neighbourhood data and **1.42×** with the fairness rule. The Georgia model also works on NC unchanged (PR-AUC 0.478 vs. 0.489 trained locally). The bias is smaller in NC, and the fix helps less, so its size depends on the place.
+- **Race-blind, yet unfair:** model A wrongly flags **12.0%** of qualified Black applicants vs. **4.0%** of white: **2,718 qualified Black Georgians** in one year.
+- **Neighbourhood is a major proxy:** a second model guesses race from A's inputs with ROC-AUC **0.88** (0.5 = coin flip). Neighbourhood inputs explain about **56%** of the excess gap; the rest comes through loan-to-value, debt-to-income and loan type. Changing **only "% minority residents"** flips 49% of wrongly flagged Black applicants to approved (16% for white).
+- **The fixes:** dropping neighbourhood data costs almost nothing (0.516 → 0.511) and needs no race data, a *less discriminatory alternative*. The fairness constraint cuts the gap to **1.21×** with 97% of the PR-AUC: **1,191 fewer** qualified Black applicants flagged, at a cost of **747 more** qualified white applicants (4.0% → 5.6%).
+- **It holds where we live:** in **North Carolina**, the same recipe gives **2.09× → 1.72× → 1.42×**. The bias is smaller there, and so is the fix's effect.
+- **Which lenders to look at:** our audit tool compares each lender's denials with what applicants' finances alone predict. Across 60 Georgia lenders, the median Black/white denial gap is **2.49×**; after finances, still **1.65×**, and **27 lenders (45%)** have a gap finances can't explain (NC: 24 of 42). Published **anonymised**: without credit scores, it is a reason to look closer, not proof.
 
-**Limitations.** HMDA has no credit scores. Our labels are past bank decisions, so we measure **disparities, not intent**. Equal false-alarm rates mean unequal precision by group, a known fairness trade-off. Using race in training is legally debated; fix B avoids it. Two states, two years. Details are in the Technical appendix.
+**Limitations.** HMDA has no credit scores; labels are past bank decisions, so we measure **disparities, not intent**. Equal false-alarm rates mean unequal precision by group, a known trade-off. Using race in training is legally debated; fix B avoids it. Two states, two years. Details are in the Technical appendix.
 
 ## What we'd do next
 
-Extend the audit from two states to all 50, add lender-level effects, and test it against lenders' real underwriting rules.
+Extend the audit to all 50 states with lender-level effects, and test it against lenders' real underwriting rules.
 
 ## Sources
 
