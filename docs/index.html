@@ -1,0 +1,228 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FairLens · Race-Blind Isn't Fair</title>
+<meta name="description" content="Same person, different address. Does a race-blind mortgage AI change its answer? A live demo built on 264,340 real Georgia mortgage applications.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+/* Quiet dark: flat surfaces, hairline borders, small status dots. Cheap to paint. */
+:root { --bg:#0B0E13; --surface:#11151C; --input:#0E1218; --ink:#E8EDF3; --muted:#8B97A8; --line:#1F2630; --line2:#2A323E;
+        --ok:#55C28E; --no:#EC7A6F; --accent:#8AB4F8; color-scheme: dark; }
+* { box-sizing: border-box; }
+html, body { margin: 0; background: var(--bg); color: var(--ink); font: 400 16px/1.5 "IBM Plex Sans", system-ui, sans-serif; -webkit-font-smoothing: antialiased; }
+.wrap { max-width: 1180px; margin: 0 auto; padding: 34px max(16px, env(safe-area-inset-right)) 40px max(16px, env(safe-area-inset-left)); }
+.eyebrow { font-size: 13px; font-weight: 500; color: var(--muted); }
+h1 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; margin: 10px 0; color: #fff; text-wrap: balance; }
+.lede { font-size: 17px; color: var(--muted); max-width: 720px; margin: 0; }
+.lede b { color: var(--ink); font-weight: 500; }
+.banner { border-top: 1px solid var(--line); margin-top: 18px; padding: 14px 0 6px; }
+.banner small { font-size: 12px; font-weight: 500; color: var(--muted); }
+.banner p { margin: 4px 0 0; max-width: 900px; }
+.banner b { color: #fff; font-weight: 600; } .tok { color: var(--ok); font-weight: 600; } .tno { color: var(--no); font-weight: 600; }
+.layout { display: grid; grid-template-columns: minmax(0, 7fr) minmax(0, 4fr); gap: 20px; margin-top: 6px; align-items: start; }
+.step { display: flex; gap: 8px; align-items: baseline; font-size: 14px; font-weight: 500; margin: 14px 0 8px; }
+.step span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.seg { display: grid; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 10px; background: var(--surface); border: 1px solid var(--line); }
+.seg button { font: inherit; font-size: 15px; font-weight: 500; color: var(--muted); background: transparent; border: 0; border-radius: 7px; min-height: 44px; cursor: pointer;
+  transition: background-color 120ms ease, color 120ms ease; }
+.seg button:hover { color: var(--ink); }
+.seg button:active { transform: scale(0.98); }
+.seg button[aria-pressed="true"] { color: #fff; background: #1E2530; }
+button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.panel { background: var(--surface); border: 1px solid var(--line); border-radius: 12px; }
+.cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.card { padding: 18px 20px; }
+.card.ok { --state: var(--ok); } .card.no { --state: var(--no); }
+.ct { font-size: 16px; font-weight: 600; color: #fff; }
+.cs { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.verdict { display: flex; align-items: center; gap: 9px; margin: 18px 0 14px; font-size: 22px; font-weight: 600; color: var(--state); letter-spacing: -0.01em; }
+.dot { width: 8px; height: 8px; border-radius: 50%; background: var(--state); flex: none; }
+.mk { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; } .mk b { color: var(--ink); font-weight: 600; }
+.meter { position: relative; height: 4px; background: var(--line2); border-radius: 2px; margin: 10px 0 6px; }
+.fill { position: absolute; inset: 0 auto 0 0; background: var(--state); border-radius: 2px; transition: width 200ms ease-out; }
+.tick { position: absolute; top: -5px; bottom: -5px; width: 1.5px; background: var(--ink); }
+.scale { position: relative; height: 16px; font-size: 12px; color: var(--muted); }
+.scale .tl { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.fix { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fix small { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.fix div { font-size: 15px; line-height: 1.45; margin-top: 2px; } .fix b { color: #fff; font-weight: 600; }
+.strip { padding: 4px 18px 8px; margin-top: 12px; overflow-x: auto; }
+table { width: 100%; border-collapse: collapse; table-layout: fixed; font-variant-numeric: tabular-nums; min-width: 520px; }
+th, td { text-align: left; padding: 11px 6px; border-top: 1px solid var(--line); vertical-align: middle; }
+thead th { border-top: 0; font-size: 13px; font-weight: 500; } thead small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
+th:first-child { width: 30%; } tbody th { font-size: 14px; font-weight: 600; color: #fff; }
+.chip { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; color: var(--state); white-space: nowrap; }
+.chip.ok { --state: var(--ok); } .chip.no { --state: var(--no); }
+.chip em { font-style: normal; color: var(--muted); font-weight: 400; }
+.tag { display: block; margin-top: 3px; font-size: 12px; color: var(--muted); font-weight: 400; } .tag.flip { color: var(--no); }
+.form { padding: 18px; display: grid; gap: 14px; }
+.ptitle { font-size: 15px; font-weight: 600; color: #fff; } .psub { font-size: 13px; color: var(--muted); margin-top: 3px; }
+label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
+select { font: inherit; font-size: 15px; color: var(--ink); background: var(--input); border: 1px solid var(--line2); border-radius: 8px; padding: 9px 10px; min-height: 44px; }
+.row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+.rangehead { display: flex; justify-content: space-between; } .rangehead b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
+input[type=range] { width: 100%; accent-color: var(--accent); min-height: 32px; }
+.check { display: flex; align-items: center; gap: 10px; color: var(--ink); cursor: pointer; min-height: 32px; }
+.check input { width: 18px; height: 18px; accent-color: var(--accent); }
+.reset { font: inherit; font-weight: 500; color: var(--ink); background: transparent; border: 1px solid var(--line2); border-radius: 9px; min-height: 44px; cursor: pointer; }
+.reset:hover { background: #171C24; } .reset:active { transform: scale(0.98); }
+.foot { border-top: 1px solid var(--line); margin-top: 22px; padding-top: 16px; font-size: 13px; color: var(--muted); line-height: 1.6; }
+.foot b { color: var(--ink); font-weight: 600; } .foot a { color: var(--accent); }
+.loading { color: var(--muted); padding: 30px 0; }
+@media (max-width: 860px) { .layout { grid-template-columns: minmax(0, 1fr); } }
+@media (max-width: 560px) { .cards { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+</style>
+</head>
+<body>
+<main class="wrap">
+  <div class="eyebrow">FairLens · built on 264,340 real Georgia mortgage applications (trained on 2022, tested on 2023)</div>
+  <h1>Same person, different address.<br>Does the AI change its answer?</h1>
+  <p class="lede">Banks use AI to approve mortgages. These two AIs are <b>never told anyone's race</b>, but one of them is told the neighborhood. Watch what that does.</p>
+  <div class="banner" role="status" aria-live="polite"><small>What you're seeing</small><p id="banner" class="loading">Loading the models' answers…</p></div>
+
+  <div class="layout">
+    <section>
+      <div class="step"><span>1.</span>Pick where the home is</div>
+      <div class="seg" id="nb" role="group" aria-label="Neighborhood"></div>
+      <div class="step"><span>2.</span>Compare the two AIs. Neither one ever sees race.</div>
+      <div class="cards" id="cards"></div>
+      <div class="panel strip">
+        <div class="step"><span>3.</span>See this person at every address at once</div>
+        <table><thead id="thead"></thead><tbody id="tbody"></tbody></table>
+      </div>
+    </section>
+
+    <aside class="panel form" aria-label="The applicant">
+      <div><div class="ptitle">The applicant</div>
+        <div class="psub">Filled in with a constructed borderline example (not a real person). Change anything and both AIs update instantly.</div></div>
+      <button class="reset" id="reset">Reset to the example applicant</button>
+      <label>Yearly income<select id="income"></select></label>
+      <div class="row2">
+        <label>Loan<select id="loan"></select></label>
+        <label>Down payment<select id="down"></select></label>
+      </div>
+      <label><span class="rangehead">Monthly debts as % of income <b id="dtiv"></b></span>
+        <input type="range" id="dti" min="0" step="1" aria-describedby="dtiv"></label>
+      <label>Loan type<select id="lt"></select></label>
+      <label class="check"><input type="checkbox" id="co">Has a co-applicant</label>
+    </aside>
+  </div>
+
+  <div class="foot">
+    Our fixed AI can't see the neighborhood at all, so here its answer can't change with the address by design. What matters is the
+    result across all 117,547 real 2023 applications: the typical AI wrongly flagged qualified Black applicants <b>3.0×</b> as often as
+    qualified white applicants; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score. The trade-off: qualified
+    white applicants are flagged a little more often (4.0% → 5.6%).<br>
+    This page shows the real models' answers, pre-computed for every combination of these inputs.
+    Code, data pipeline and write-up: <a href="https://github.com/kabirshah4/race-blind-isnt-fair">github.com/kabirshah4/race-blind-isnt-fair</a>.<br>
+    Team KV Gods · Veritas AI High School Hackathon 2026 · Prototype, not financial advice.
+  </div>
+</main>
+
+<script>
+const MODELS = [
+  { key: "A", title: "Typical bank AI", sub: "Uses the neighborhood · never sees race" },
+  { key: "C", title: "Our fixed AI", sub: "Ignores the neighborhood · fairness-trained" },
+];
+const NOTE = { "Mostly white": "under 20% minority", "Mixed": "40–60% minority", "Mostly minority": "over 90% minority" };
+const EXAMPLE = { income: 60, loan: 100, down: 20, dti: 42, lt: "Conventional", co: 0 };
+let D, state = { ...EXAMPLE, nb: "Mostly minority" };
+const $ = (id) => document.getElementById(id);
+const pct = (r) => Math.round(r / 10) + "%";
+const money = (k) => "$" + k + "K";
+
+// Same order the Python export used: income, loan, down, dti, loan type, co-applicant (innermost).
+function idx(s) {
+  const a = D.axes;
+  let i = a.income.indexOf(s.income);
+  i = i * a.loan.length + a.loan.indexOf(s.loan);
+  i = i * a.down.length + a.down.indexOf(s.down);
+  i = i * a.dti.length + a.dti.indexOf(s.dti);
+  i = i * a.loan_type.length + a.loan_type.indexOf(s.lt);
+  return i * 2 + s.co;
+}
+const risk = (key, s, nb) => key === "A" ? D.A[nb][idx(s)] : D.C[idx(s)];
+const denied = (key, s, nb) => risk(key, s, nb) >= D.cutoff[key];
+const dtiLabel = (v) => D.dti_label[v] || v + "%";
+
+function advice(key, s) {
+  const tries = [];
+  for (const v of [40, 36, 33, 25]) if (v < s.dti) tries.push([`Lower debts to ${dtiLabel(v)} of income`, { dti: v }]);
+  const smaller = D.axes.loan.filter((l) => l < s.loan).slice(-2).reverse();
+  for (const l of smaller) tries.push([`Borrow less (${money(l)})`, { loan: l }]);
+  if (!s.co) tries.push(["Add a co-applicant", { co: 1 }]);
+  for (const [label, change] of tries) if (!denied(key, { ...s, ...change }, s.nb)) return label;
+  if (key === "A") for (const nb of D.neighbourhoods)
+    if (nb !== s.nb && !denied("A", s, nb))
+      return `Not lower debts, a smaller loan or a co-applicant. <b>Only moving to a "${nb.toLowerCase()}" neighborhood</b> flips it.`;
+  return "None of the small changes we tried flips it";
+}
+
+function card(m) {
+  const r = risk(m.key, state, state.nb), cut = D.cutoff[m.key], bad = r >= cut;
+  const scale = Math.max(400, r * 1.15), fill = Math.min(r / scale, 1) * 100, tick = cut / scale * 100;
+  return `<article class="panel card ${bad ? "no" : "ok"}" aria-label="${m.title}: ${bad ? "would deny" : "would approve"}">
+    <div class="ct">${m.title}</div><div class="cs">${m.sub}</div>
+    <div class="verdict"><span class="dot"></span>${bad ? "Would deny" : "Would approve"}</div>
+    <div class="mk">Chance this AI says deny: <b>${pct(r)}</b></div>
+    <div class="meter"><div class="fill" style="width:${fill.toFixed(1)}%"></div><div class="tick" style="left:${tick.toFixed(1)}%"></div></div>
+    <div class="scale"><span>0%</span><span class="tl" style="left:${tick.toFixed(1)}%">denies above ${pct(cut)}</span></div>
+    ${bad ? `<div class="fix"><small>What would change its mind?</small><div>${advice(m.key, state)}</div></div>` : ""}
+  </article>`;
+}
+
+function render() {
+  $("nb").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.nb === state.nb));
+  $("dtiv").textContent = dtiLabel(state.dti);
+  $("cards").innerHTML = MODELS.map(card).join("");
+  $("tbody").innerHTML = MODELS.map((m) => {
+    const v = D.neighbourhoods.map((nb) => denied(m.key, state, nb));
+    const flips = new Set(v).size > 1;
+    return `<tr><th scope="row">${m.title}<span class="tag ${flips ? "flip" : ""}">${flips ? "Answer changes with the address" : "Same answer everywhere"}</span></th>` +
+      D.neighbourhoods.map((nb, i) => `<td><span class="chip ${v[i] ? "no" : "ok"}"><span class="dot"></span>${v[i] ? "Deny" : "Approve"}<em>${pct(risk(m.key, state, nb))}</em></span></td>`).join("") + "</tr>";
+  }).join("");
+  const aFlips = new Set(D.neighbourhoods.map((nb) => denied("A", state, nb))).size > 1;
+  let msg;
+  if (aFlips) {
+    const here = denied("A", state, state.nb) && !denied("C", state, state.nb)
+      ? ` At a <b>${state.nb.toLowerCase()}</b> address, the typical AI says <span class="tno">deny</span> and our fixed AI says <span class="tok">approve</span>.` : "";
+    msg = `<b>The typical bank AI changes its answer just because of the address.</b> Our fixed AI gives this person the same answer everywhere.${here}`;
+  } else {
+    msg = `For this applicant, neither AI changes its answer with the address. Press <b>Reset to the example applicant</b> to see a case where it does.`;
+  }
+  $("banner").className = ""; $("banner").innerHTML = msg;
+}
+
+function fillForm() {
+  const opt = (el, vals, fmt, cur) => { el.innerHTML = vals.map((v) => `<option value="${v}" ${v == cur ? "selected" : ""}>${fmt(v)}</option>`).join(""); };
+  opt($("income"), D.axes.income, (v) => money(v) + " a year", state.income);
+  opt($("loan"), D.axes.loan, money, state.loan);
+  opt($("down"), D.axes.down, (v) => v + "%", state.down);
+  opt($("lt"), D.axes.loan_type, (v) => v, state.lt);
+  $("dti").max = D.axes.dti.length - 1; $("dti").value = D.axes.dti.indexOf(state.dti);
+  $("co").checked = !!state.co;
+}
+
+async function start() {
+  try { D = await (await fetch("demo_data.json")).json(); }
+  catch (e) { $("banner").textContent = "Couldn't load the models' answers. Please refresh the page."; return; }
+  $("nb").innerHTML = D.neighbourhoods.map((nb) => `<button data-nb="${nb}" aria-pressed="false">${nb}</button>`).join("");
+  $("thead").innerHTML = `<tr><th></th>${D.neighbourhoods.map((nb) => `<th scope="col">${nb}<small>${NOTE[nb]}</small></th>`).join("")}</tr>`;
+  $("nb").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.nb = b.dataset.nb; render(); } });
+  $("income").onchange = (e) => { state.income = +e.target.value; render(); };
+  $("loan").onchange = (e) => { state.loan = +e.target.value; render(); };
+  $("down").onchange = (e) => { state.down = +e.target.value; render(); };
+  $("lt").onchange = (e) => { state.lt = e.target.value; render(); };
+  $("dti").oninput = (e) => { state.dti = D.axes.dti[+e.target.value]; render(); };
+  $("co").onchange = (e) => { state.co = e.target.checked ? 1 : 0; render(); };
+  $("reset").onclick = () => { state = { ...EXAMPLE, nb: state.nb }; fillForm(); render(); };
+  fillForm(); render();
+}
+start();
+</script>
+</body>
+</html>
