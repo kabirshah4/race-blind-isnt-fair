@@ -354,3 +354,17 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
 - Added "Why we care" and the team name (KV Gods).
 - The demo app now reads its neighbourhood profiles from `models/neighbourhoods.json`, so it
   runs from a fresh clone with no data download.
+
+### Step 12: More impact and clarity (Sat ~3–4 AM)
+- **Human-scale numbers:** model A wrongly flags **2,718 qualified Black Georgians** in 2023; the
+  fairness fix spares **1,191** of them, at a cost of **747** more qualified white applicants flagged.
+- **Lender-audit tool** (`src/audit_lender.py`): for each lender, compares actual denials with what
+  applicants' finances alone predict (a model with no race and no neighbourhood). Georgia: 60
+  lenders, median gap 2.49x raw → 1.65x after finances, 27 (45%) worth a closer look. NC: 24 of 42.
+  Published **anonymised** on purpose (no credit scores = a reason to look, not proof).
+  `--lei <id>` makes a one-page report for one lender; those reports stay off GitHub.
+- **Live demo:** https://kabirshah4.github.io/race-blind-isnt-fair/ (free GitHub Pages).
+  Hugging Face now charges for Python demos, so `src/export_demo.py` pre-computes both models'
+  answers for 47,880 input combinations × 3 neighbourhoods; `docs/index.html` looks them up.
+  Checked: matches the Python app exactly for the example applicant; works on phones.
+- README opens with a 10-second summary; write-up ~860 words.
