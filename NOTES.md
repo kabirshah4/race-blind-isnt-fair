@@ -363,7 +363,7 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   lenders, median gap 2.49x raw → 1.65x after finances, 27 (45%) worth a closer look. NC: 24 of 42.
   Published **anonymised** on purpose (no credit scores = a reason to look, not proof).
   `--lei <id>` makes a one-page report for one lender; those reports stay off GitHub.
-- **Live demo:** https://kabirshah4.github.io/race-blind-isnt-fair/ (free GitHub Pages).
+- **Live demo (named FairView):** https://fairview-ai.pages.dev, backup https://kabirshah4.github.io/race-blind-isnt-fair/ (both free).
   Hugging Face now charges for Python demos, so the page runs the **real models in the browser**:
   `src/export_models.py` writes out every decision tree of both models (`docs/models.json`), and
   the page walks the same trees in JavaScript. Any number you type gets a live answer.

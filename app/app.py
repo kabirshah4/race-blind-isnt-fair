@@ -1,4 +1,4 @@
-"""FairLens demo: the same mortgage applicant, judged by two race-blind models.
+"""FairView demo: the same mortgage applicant, judged by two race-blind models.
 
 Run:  .venv/bin/python app/app.py      then open http://127.0.0.1:7860
 Needs models/model_A_full.joblib and models/model_C_fair.joblib (made by src/fix.py)
@@ -310,9 +310,9 @@ HEAD = (# Light-only design: force Gradio's light theme so its own widgets match
         'v.className="fl-v "+(t[1]?"no":"ok");v.innerHTML="<i></i>"+(t[1]?"Deny":"Approve");'
         'if(t[1]){var r=document.getElementById("hRowA");r.classList.remove("flash");void r.offsetWidth;r.classList.add("flash");}},350);},2600);})();</script>')
 
-with gr.Blocks(title="FairLens") as demo:
+with gr.Blocks(title="FairView") as demo:
     gr.HTML("""<div class="fl-hero"><div class="fl-haze"></div><div class="fl-grain"></div>
-      <div class="fl-brand fl-rise">FairLens</div>
+      <div class="fl-brand fl-rise">FairView</div>
       <h1 class="fl-rise fl-d1">Same person.<br>Different address.</h1>
       <p class="fl-lede fl-rise fl-d2">Banks use AI to approve mortgages. These two AIs are never told anyone's race,
          but one of them is told the neighborhood. Watch what that does.</p>
@@ -368,4 +368,4 @@ with gr.Blocks(title="FairLens") as demo:
     demo.load(judge, fields, outs, show_progress="hidden")
 
 if __name__ == "__main__":
-    demo.launch(css=CSS, head=HEAD, theme=gr.themes.Base(primary_hue="blue", neutral_hue="slate", radius_size="lg"))
+    demo.launch(css=CSS, head=HEAD, favicon_path=str(Path(__file__).resolve().parents[1] / "docs" / "favicon.svg"), theme=gr.themes.Base(primary_hue="blue", neutral_hue="slate", radius_size="lg"))

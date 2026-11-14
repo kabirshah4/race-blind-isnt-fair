@@ -1,8 +1,8 @@
-# Race-Blind Isn't Fair: Auditing a Mortgage Model for Neighbourhood Proxies
+# FairView · Race-Blind Isn't Fair: Auditing a Mortgage Model for Neighbourhood Proxies
 
 **Track:** AI + Finance · **Team:** KV Gods (Kabir Shah, Vishnu Veer)
 **Starting point:** Extends suggested project 4.2.3 (fairness audit of a loan model) to real 2022–2023 US mortgage data
-**Live demo:** https://kabirshah4.github.io/race-blind-isnt-fair/ · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair
+**Live demo:** https://fairview-ai.pages.dev (backup: https://kabirshah4.github.io/race-blind-isnt-fair/) · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair
 
 *This project is a prototype and is not financial advice.*
 

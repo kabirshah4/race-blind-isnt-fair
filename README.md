@@ -1,15 +1,15 @@
-# Race-Blind Isn't Fair: Auditing a Mortgage Model for Neighbourhood Proxies
+# FairView · Race-Blind Isn't Fair: Auditing a Mortgage Model for Neighbourhood Proxies
 
 **Track:** AI + Finance · **Team:** KV Gods (Kabir Shah, Vishnu Veer)
 **Starting point:** Extends suggested project 4.2.3 (fairness audit of a loan model) to real 2022–2023 US mortgage data
-**Live demo:** https://kabirshah4.github.io/race-blind-isnt-fair/ · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair
+**Live demo:** https://fairview-ai.pages.dev (backup: https://kabirshah4.github.io/race-blind-isnt-fair/) · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair
 
 *This project is a prototype and is not financial advice.*
 
 > ## In 10 seconds
 > **A mortgage AI that never sees race still wrongly flagged qualified Black applicants 3× as often as qualified white applicants**, mostly through neighbourhood data. We measured it on 264,340 real Georgia applications, confirmed it in North Carolina, cut the gap to 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps their applicants' finances can't explain.
 >
-> - **Try it live:** [https://kabirshah4.github.io/race-blind-isnt-fair/](https://kabirshah4.github.io/race-blind-isnt-fair/) (same person, switch only the address; works on phones)
+> - **Try it live:** [fairview-ai.pages.dev](https://fairview-ai.pages.dev) (same person, switch only the address; works on phones)
 > - **The finding:** 2,718 qualified Black Georgians wrongly flagged by a race-blind model; neighbourhood explains ~56% of the excess gap
 > - **The tool:** `python src/audit_lender.py --lei <lender>` gives a one-page screening report for any lender
 >
