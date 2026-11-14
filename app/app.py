@@ -324,7 +324,7 @@ with gr.Blocks(title="FairView") as demo:
         <small>Real model answers for one constructed example applicant.</small>
       </div></div>
       <div class="fl-stats">
-        <div><strong>3.0×</strong><span>how often a race-blind AI wrongly flagged qualified Black applicants vs. white</span></div>
+        <div><strong>3.0×</strong><span>how often a race-blind AI wrongly flagged bank-approved Black applicants vs. white</span></div>
         <div><strong>1.2×</strong><span>after our fix, keeping 97% of the model's accuracy score</span></div>
         <div><strong>264,340</strong><span>real Georgia mortgage applications, 2022–2023</span></div>
       </div>""")
@@ -349,9 +349,9 @@ with gr.Blocks(title="FairView") as demo:
             thirty_year = gr.Checkbox(MAYA["thirty_year"], label="30-year mortgage")
             coapplicant = gr.Checkbox(MAYA["coapplicant"], label="Has a co-applicant")
     gr.HTML("""<div class="fl-foot">Our fixed AI can’t see the neighborhood at all, so here its answer can’t change with the address by design.
-      What matters is the result across all 117,547 real 2023 applications: the typical AI wrongly flagged qualified Black applicants
-      <b>3.0×</b> as often as qualified white applicants; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score.
-      The trade-off: qualified white applicants are flagged a little more often (4.0% → 5.6%).<br>
+      What matters is the result across all 117,547 real 2023 applications: the typical AI wrongly flagged bank-approved Black applicants
+      <b>3.0×</b> as often as white ones; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score.
+      The trade-off: white applicants the bank approved are flagged a little more often (4.0% → 5.6%).<br>
       Data: public HMDA records from the CFPB / FFIEC (ffiec.cfpb.gov). Built with pandas, scikit-learn, XGBoost, fairlearn and Gradio; Claude Code helped write code.<br>
       Prototype built for the Veritas AI High School Hackathon. Not financial advice.</div>""")
 

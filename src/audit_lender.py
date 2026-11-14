@@ -72,7 +72,7 @@ def auditable(d):
 def lender_row(d):
     b, w = d[d.race_group == "Black"], d[d.race_group == "White"]
     boots = []
-    for _ in range(200):
+    for _ in range(1000):   # 1,000 draws, same as src/lender_chart.py
         boots.append(gap(pd.concat([b.sample(len(b), replace=True, random_state=rng.integers(1e9)),
                                     w.sample(len(w), replace=True, random_state=rng.integers(1e9))])))
     boots = np.array(boots)

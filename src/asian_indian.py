@@ -51,7 +51,7 @@ def main():
     for g, m in [("Asian Indian", ai), ("White", wh)]:
         rows.append({"group": g, "applications": int(m.sum()),
                      "bank denied %": round(100 * (1 - test.approved[m].mean()), 1),
-                     "model A false alarms % (qualified, wrongly flagged)": round(100 * flagged[m & ok].mean(), 1)})
+                     "model A false alarms % (bank-approved, wrongly flagged)": round(100 * flagged[m & ok].mean(), 1)})
     t = pd.DataFrame(rows)
     fa = ratio(np.arange(len(test)))
     summary = (f"Georgia 2023: banks denied {t.iloc[0]['bank denied %']}% of Asian Indian applicants vs. "
@@ -62,7 +62,7 @@ def main():
     (ROOT / "results_asian_indian.md").write_text(
         "# Asian Indian vs. white applicants, Georgia 2023\n\n" + summary + "\n\n" + t.to_markdown(index=False) +
         "\n\nAsian Indian = HMDA `applicant_race-1` code 21, non-Hispanic. White = the project's White group. "
-        "A ratio near 1 means model A does not over-flag qualified Asian Indian applicants. Small group, so the range is wide.\n")
+        "A ratio near 1 means model A does not over-flag bank-approved Asian Indian applicants. Small group, so the range is wide.\n")
 
 
 if __name__ == "__main__":

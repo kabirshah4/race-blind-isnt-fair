@@ -5,7 +5,7 @@ Writes results_case_study.md.
 
 The brief asks every project to show at least one example its model gets wrong. Our
 fairness numbers are about groups, so this picks ONE real 2023 Georgia application that:
-  * the bank approved (a qualified applicant),
+  * the bank approved,
   * model A (race-blind, uses neighbourhood data) wrongly flags as "likely denied",
   * model A approves once ONLY the 7 neighbourhood numbers are swapped to the typical
     mostly-white tract (models/neighbourhoods.json), with everything else unchanged.
@@ -57,19 +57,19 @@ def main():
         f"on a ${r5(p.property_value)}K home ({p.ltv:.0f}% loan-to-value), debts around {p.dti:.0f}% of income, "
         f"{LOAN_TYPE.get(p.loan_type, 'other')} loan, {'with' if p.has_coapplicant else 'no'} co-applicant. "
         f"Their census tract is about {r5(p.tract_minority_population_percent)}% minority.\n\n"
-        f"* **The bank approved them.** They were qualified.\n"
+        f"* **The bank approved them.**\n"
         f"* **Model A wrongly flags them:** {p.rA:.0%} chance of denial, above its {A['cutoff']:.0%} cut-off.\n"
         f"* **Same person, typical mostly-white tract** (only the 7 neighbourhood numbers change): "
         f"{p.rA_swap:.0%}, so model A would approve.\n"
         f"* **Our fixed model C** (no neighbourhood data): {p.rC:.0%}, below its {C['cutoff']:.0%} cut-off, so it approves.\n\n"
-        f"How common this is: of {len(wrong):,} qualified Black applicants model A wrongly flagged in 2023, "
+        f"How common this is: of {len(wrong):,} bank-approved Black applicants model A wrongly flagged in 2023, "
         f"{len(flips):,} ({len(flips) / len(wrong):.0%}) would be approved by model A at the mostly-white tract.\n\n"
         "**Why we think model A gets this wrong:** nothing about this person's finances changed between the two "
         "runs; only the neighbourhood numbers did. Model A learned from past bank decisions that applications from "
         "high-minority tracts were denied more often, so it carries that pattern forward as if the address were a "
         "risk factor. Model C never sees the neighbourhood, so it can't.\n")
     print(story)
-    (ROOT / "results_case_study.md").write_text("# Case study: one qualified applicant model A gets wrong\n\n" + story +
+    (ROOT / "results_case_study.md").write_text("# Case study: one bank-approved applicant model A gets wrong\n\n" + story +
         "\nPicked by `src/case_study.py`: the wrongly-flagged, address-flips, model-C-approves applicant closest to "
         "that group's median income, loan and debt-to-income. Numbers rounded; no lender, county or tract named.\n")
 

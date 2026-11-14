@@ -361,7 +361,8 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   fairness fix spares **1,191** of them, at a cost of **747** more qualified white applicants flagged.
 - **Lender-audit tool** (`src/audit_lender.py`): for each lender, compares actual denials with what
   applicants' finances alone predict (a model with no race and no neighbourhood). Georgia: 60
-  lenders, median gap 2.49x raw → 1.65x after finances, 27 (45%) worth a closer look. NC: 24 of 42.
+  lenders, median gap 2.49x raw → 1.65x after finances, 27 (45%) worth a closer look with 200 draws; with 1,000 draws
+  and a Benjamini-Hochberg correction (Vishnu's `src/lender_chart.py`) it is **30 of 60 (50%)**, the number we now use. NC: 24 of 42.
   Published **anonymised** on purpose (no credit scores = a reason to look, not proof).
   `--lei <id>` makes a one-page report for one lender; those reports stay off GitHub.
 - **Live demo (named FairView):** https://fairview-ai.pages.dev, backup https://kabirshah4.github.io/race-blind-isnt-fair/ (both free).

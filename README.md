@@ -7,10 +7,10 @@
 *This project is a prototype and is not financial advice.*
 
 > ## In 10 seconds
-> **A mortgage AI that never sees race still wrongly flagged qualified Black applicants 3× as often as qualified white applicants**, mostly through neighbourhood data. We measured it on 264,340 real Georgia applications, confirmed it in North Carolina, cut the gap to 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps their applicants' finances can't explain.
+> **A mortgage AI built the way lenders build them, never shown race, still wrongly flagged bank-approved Black applicants about 3× as often as white ones**, mostly through neighbourhood data. We measured it on 264,340 real Georgia applications, confirmed it in North Carolina, cut the gap to 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps the finances we can see don't explain (30 of 60 in Georgia; a lead, not proof).
 >
 > - **Try it live:** [fairview-ai.pages.dev](https://fairview-ai.pages.dev) (same person, switch only the address; works on phones)
-> - **The finding:** 2,718 qualified Black Georgians wrongly flagged by a race-blind model; neighbourhood explains ~56% of the excess gap
+> - **The finding:** 2,718 bank-approved Black Georgians wrongly flagged by a race-blind model (stable across 5 retrains: 2.85–2.95×); neighbourhood explains ~56% of the excess gap
 > - **The tool:** `python src/audit_lender.py --lei <lender>` gives a one-page screening report for any lender
 >
 > ![The fix](figures/3_the_fix.png)
@@ -23,15 +23,15 @@
 
 **Leakage (three rounds).** (1) Interest rate, rate spread, loan costs and denial reasons only exist after a decision, so we dropped them; the reported loan-to-value was missing for 34% of denials vs. 7.5% of approvals, so we recalculated it as loan ÷ property value. (2) Missing addresses (stored as all-zero tract data) were 5× more common among denials, so we removed those 0.15% of rows. (3) An independent review found `preapproval` (denied pre-approval requests use action code 7, which we never download, so "asked for pre-approval" meant 0% denied) and `initially_payable_to_institution` (code 3 = 83% denied). We removed both and re-ran everything. All numbers are after all three fixes.
 
-**Set-up.** One XGBoost setting is used by every script. Each model flags the same share of applicants (the 2022 denial rate), with the cut-off chosen on 2022 data. At the strictest DTI rule's flag rate (DTI > 55%, 2.7% of applicants), the model's precision is 0.94 vs. 0.86 for the rule. A plain logistic regression (PR-AUC 0.338) did not beat the rule, which is why we used XGBoost.
+**Set-up.** One XGBoost setting is used by every script. Each model's cut-off is set to flag the 2022 denial rate on 2022 data; on 2023 that is 10.3% of applicants for A and 9.5% for C. At the strictest DTI rule's flag rate (DTI > 55%, 2.7% of applicants), the model's precision is 0.94 vs. 0.86 for the rule. A plain logistic regression (PR-AUC 0.338) did not beat the rule, which is why we used XGBoost.
 
 **Proxy detail.** Detective ROC-AUC for guessing Black vs. white: all inputs 0.88, neighbourhood only 0.845, applicant finances only 0.765. Dropping only "% minority residents" leaves 2.32× (2.19–2.43), so the proxy is spread across several neighbourhood inputs.
 
-**Counterfactual detail** (`results_counterfactual.md`). Swapping all 7 neighbourhood numbers to a typical mostly-white tract flips 53% of wrongly flagged qualified Black applicants vs. 22% of white ones. Swapping only "% minority" flips 49% vs. 16%; only the other 6 numbers, 30% vs. 17%. Restricted to people near the cut-off (risk under 1.5× the cut-off), all 7: 70% vs. 37%.
+**Counterfactual detail** (`results_counterfactual.md`). Swapping all 7 neighbourhood numbers to a typical mostly-white tract flips 53% of wrongly flagged bank-approved Black applicants vs. 22% of white ones. Swapping only "% minority" flips 49% vs. 16%; only the other 6 numbers, 30% vs. 17%. Restricted to people near the cut-off (risk under 1.5× the cut-off), all 7: 70% vs. 37%.
 
 **Fairness-constrained model C.** fairlearn's Exponentiated Gradient with false-positive-rate parity. The rule was chosen on a 20% validation split of 2022: the default *difference* rule ("within 1 point") left 1.74× at our cut-off, the *ratio* rule (≥ 0.9) left 1.31×. fairlearn enforces its rule on its own randomized classifier at a 0.5 threshold, while we average the sub-models' scores and use our cut-off, so this is an observation, not a proof, and C's fairness is measured on held-out data, not guaranteed. C was trained on a 60,000-row sample of 2022 because the method is slow, so some of its PR-AUC drop may come from less data.
 
-**Costs by group** (`results_fix.md`). False alarms (white / Black): A 4.0% / 12.0%, C 5.6% / 6.8%. Recall: A 39.5% / 52.4%, C 41.2% / 46.5%. Precision: C 31.2% / 56.1%. Equal false-alarm rates with different base rates mean unequal precision (the Chouldechova / Kleinberg trade-off); we chose false alarms because wrongly denying a qualified person is the harm we care about.
+**Costs by group** (`results_fix.md`). False alarms (white / Black): A 4.0% / 12.0%, C 5.6% / 6.8%. Recall: A 39.5% / 52.4%, C 41.2% / 46.5%. Precision: C 31.2% / 56.1%. Equal false-alarm rates with different base rates mean unequal precision (the Chouldechova / Kleinberg trade-off); we chose false alarms because wrongly denying a bank-approved person is the harm we care about.
 
 **Confidence intervals** resample only the 2023 test rows (200 draws). They don't include training randomness or clustering by lender or tract, so they are somewhat too narrow.
 
@@ -39,7 +39,7 @@
 
 **Where it fails** (`src/failures.py`, `results_failures.md`). Model A misses 53% of real denials; 53% of those misses were denied for reasons public data can't show (credit history, incomplete or unverifiable applications), using HMDA's own denial-reason field. Swapping only the neighbourhood clears 53% of the 2,718 Black false alarms. Model C newly flags 1,215 bank-approved white applicants (net +747), catches 44% of denials vs 47%, and also lowers Hispanic false alarms (1.61× → 0.96× the white rate).
 
-**Lender audit** (`src/audit_lender.py`, `results_lenders.md`, `results_lenders_nc.md`). A finances-only XGBoost (no race, no neighbourhood) trained on the previous year gives each application an expected denial chance. For each lender: excess = observed ÷ expected denial rate per group, and finance-adjusted gap = Black excess ÷ white excess, with a 200-draw bootstrap range. Lenders need 50+ Black and white applications and 5+ denials per group. Results are anonymised; single-lender reports (`--lei`) are kept out of the repo.
+**Lender audit** (`src/audit_lender.py`, `results_lenders.md`, `results_lenders_nc.md`). A finances-only XGBoost (no race, no neighbourhood) trained on the previous year gives each application an expected denial chance. For each lender: excess = observed ÷ expected denial rate per group, and finance-adjusted gap = Black excess ÷ white excess, with a 1,000-draw bootstrap range; `src/lender_chart.py` adds a Benjamini-Hochberg correction for testing 60 lenders at once (30 of 60 still stand out) and a chart, `figures/4_lenders.png`. Lenders need 50+ Black and white applications and 5+ denials per group. Results are anonymised; single-lender reports (`--lei`) are kept out of the repo.
 
 **Demo example.** The demo's applicant is constructed: one of 174 combinations we tested where the address alone flips model A. Model C ignores neighbourhood, so its answer can't change with the address by design. The demo illustrates the result; the evidence is the test-set audit above.
 
@@ -59,6 +59,10 @@ python src/audit.py           # 5. fairness audit of model A + proxy detective -
 python src/counterfactual.py  # 6. "same person, different address" -> results_counterfactual.md
 python src/other_state.py     #    second-state check, North Carolina -> results_nc.md
 python src/audit_lender.py    #    lender-by-lender audit (anonymised) -> results_lenders.md; add --lei <LEI> for one lender
+python src/asian_indian.py    #    Asian Indian vs. white numbers in WRITEUP 'Why we care' -> results_asian_indian.md
+python src/case_study.py      #    one real applicant model A wrongly flags -> results_case_study.md
+python src/lender_chart.py    #    lender chart + multiple-testing correction -> results_lenders_strict.md, figures/4_lenders.png
+python src/seeds.py           #    retrain A, B, C with 5 seeds (training randomness) -> results_seeds.md
 python src/failures.py        #    where it fails: misses by the bank's denial reason, address-only false alarms, fix costs by group -> results_failures.md
 python src/charts.py          # 7. charts -> figures/
 python app/app.py             # 8. the demo app -> http://127.0.0.1:7860
