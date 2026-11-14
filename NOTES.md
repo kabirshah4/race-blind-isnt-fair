@@ -364,7 +364,9 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   Published **anonymised** on purpose (no credit scores = a reason to look, not proof).
   `--lei <id>` makes a one-page report for one lender; those reports stay off GitHub.
 - **Live demo:** https://kabirshah4.github.io/race-blind-isnt-fair/ (free GitHub Pages).
-  Hugging Face now charges for Python demos, so `src/export_demo.py` pre-computes both models'
-  answers for 47,880 input combinations × 3 neighbourhoods; `docs/index.html` looks them up.
-  Checked: matches the Python app exactly for the example applicant; works on phones.
+  Hugging Face now charges for Python demos, so the page runs the **real models in the browser**:
+  `src/export_models.py` writes out every decision tree of both models (`docs/models.json`), and
+  the page walks the same trees in JavaScript. Any number you type gets a live answer.
+  Checked: on 2,000 random applicants, 0 decisions differ from Python. Also on Cloudflare:
+  https://race-blind-isnt-fair.pages.dev
 - README opens with a 10-second summary; write-up ~860 words.

@@ -61,7 +61,7 @@ th:first-child { width: 30%; } tbody th { font-size: 14px; font-weight: 600; col
 .form { padding: 18px; display: grid; gap: 14px; }
 .ptitle { font-size: 15px; font-weight: 600; color: #fff; } .psub { font-size: 13px; color: var(--muted); margin-top: 3px; }
 label { display: grid; gap: 6px; font-size: 14px; color: var(--muted); }
-select { font: inherit; font-size: 15px; color: var(--ink); background: var(--input); border: 1px solid var(--line2); border-radius: 8px; padding: 9px 10px; min-height: 44px; }
+select, input[type=number] { width: 100%; box-sizing: border-box; font: inherit; font-size: 15px; color: var(--ink); background: var(--input); border: 1px solid var(--line2); border-radius: 8px; padding: 9px 10px; min-height: 44px; }
 .row2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .rangehead { display: flex; justify-content: space-between; } .rangehead b { color: var(--ink); font-weight: 600; font-variant-numeric: tabular-nums; }
 input[type=range] { width: 100%; accent-color: var(--accent); min-height: 32px; }
@@ -98,16 +98,18 @@ input[type=range] { width: 100%; accent-color: var(--accent); min-height: 32px; 
 
     <aside class="panel form" aria-label="The applicant">
       <div><div class="ptitle">The applicant</div>
-        <div class="psub">Filled in with a constructed borderline example (not a real person). Change anything and both AIs update instantly.</div></div>
+        <div class="psub">Filled in with a constructed borderline example (not a real person). Type anything: both real AIs run live in your browser.</div></div>
       <button class="reset" id="reset">Reset to the example applicant</button>
-      <label>Yearly income<select id="income"></select></label>
+      <label>Yearly income ($ thousands)<input type="number" id="income" min="1" step="1" inputmode="numeric"></label>
       <div class="row2">
-        <label>Loan<select id="loan"></select></label>
-        <label>Down payment<select id="down"></select></label>
+        <label>Loan ($K)<input type="number" id="loan" min="1" step="1" inputmode="numeric"></label>
+        <label>Home price ($K)<input type="number" id="price" min="1" step="1" inputmode="numeric"></label>
       </div>
+      <div class="psub" id="downv"></div>
       <label><span class="rangehead">Monthly debts as % of income <b id="dtiv"></b></span>
-        <input type="range" id="dti" min="0" step="1" aria-describedby="dtiv"></label>
+        <input type="range" id="dti" min="10" max="65" step="1" aria-describedby="dtiv"></label>
       <label>Loan type<select id="lt"></select></label>
+      <label class="check"><input type="checkbox" id="thirty">30-year mortgage</label>
       <label class="check"><input type="checkbox" id="co">Has a co-applicant</label>
     </aside>
   </div>
@@ -117,7 +119,7 @@ input[type=range] { width: 100%; accent-color: var(--accent); min-height: 32px; 
     result across all 117,547 real 2023 applications: the typical AI wrongly flagged qualified Black applicants <b>3.0×</b> as often as
     qualified white applicants; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score. The trade-off: qualified
     white applicants are flagged a little more often (4.0% → 5.6%).<br>
-    This page shows the real models' answers, pre-computed for every combination of these inputs.
+    Both AIs run live in your browser: these are the exact trained XGBoost models (every decision tree), exported from Python and checked to give identical answers.
     Code, data pipeline and write-up: <a href="https://github.com/kabirshah4/race-blind-isnt-fair">github.com/kabirshah4/race-blind-isnt-fair</a>.<br>
     Team KV Gods · Veritas AI High School Hackathon 2026 · Prototype, not financial advice.
   </div>
@@ -129,63 +131,89 @@ const MODELS = [
   { key: "C", title: "Our fixed AI", sub: "Ignores the neighborhood · fairness-trained" },
 ];
 const NOTE = { "Mostly white": "under 20% minority", "Mixed": "40–60% minority", "Mostly minority": "over 90% minority" };
-const EXAMPLE = { income: 60, loan: 100, down: 20, dti: 42, lt: "Conventional", co: 0 };
-let D, state = { ...EXAMPLE, nb: "Mostly minority" };
+const LOAN_TYPES = { "Conventional": "1", "FHA (government-backed)": "2", "VA (veterans)": "3", "USDA (rural)": "4" };
+const EXAMPLE = { income: 60, loan: 100, price: 125, dti: 42, lt: "Conventional", thirty: 1, co: 0 };
+let M, NBS, state = { ...EXAMPLE, nb: "Mostly minority" };
 const $ = (id) => document.getElementById(id);
-const pct = (r) => Math.round(r / 10) + "%";
-const money = (k) => "$" + k + "K";
+const pct = (r) => Math.round(r * 100) + "%";
+const money = (k) => "$" + Math.round(k) + "K";
+const DTI_LABEL = { 15: "under 20%", 25: "20–30%", 33: "30–36%", 55: "50–60%", 65: "over 60%" };
+const dtiLabel = (v) => DTI_LABEL[v] || v + "%";
 
-// Same order the Python export used: income, loan, down, dti, loan type, co-applicant (innermost).
-function idx(s) {
-  const a = D.axes;
-  let i = a.income.indexOf(s.income);
-  i = i * a.loan.length + a.loan.indexOf(s.loan);
-  i = i * a.down.length + a.down.indexOf(s.down);
-  i = i * a.dti.length + a.dti.indexOf(s.dti);
-  i = i * a.loan_type.length + a.loan_type.indexOf(s.lt);
-  return i * 2 + s.co;
+// ---- The real AI, run live --------------------------------------------------
+// Each model is a few hundred decision trees exported from Python (src/export_models.py).
+// Walk every tree to its leaf, add up the leaves, squash into 0–1. Model C averages 4 such models.
+function applicant(s, nb) {
+  return {
+    income: s.income, loan_amount: s.loan, property_value: s.price, ltv: s.loan / s.price * 100, dti: s.dti,
+    loan_term_360: s.thirty, has_coapplicant: s.co, loan_type: LOAN_TYPES[s.lt],
+    conforming_loan_limit: s.loan <= 766 ? "C" : "NC", submission_of_application: "1", ...NBS[nb],
+  };
 }
-const risk = (key, s, nb) => key === "A" ? D.A[nb][idx(s)] : D.C[idx(s)];
-const denied = (key, s, nb) => risk(key, s, nb) >= D.cutoff[key];
-const dtiLabel = (v) => D.dti_label[v] || v + "%";
+function risk(key, s, nb) {
+  const m = M[key], a = applicant(s, nb), f = Math.fround;
+  const x = m.numeric.map((c, i) => f(a[c] ?? m.medians[i]));
+  m.categorical.forEach((c, j) => m.categories[j].forEach((v) => x.push(String(a[c]) === v ? 1 : 0)));
+  let total = 0;
+  m.models.forEach((sub, k) => {
+    let margin = sub.base;
+    for (const t of sub.trees) {
+      let n = t[0];
+      while (n.length === 4) n = t[x[n[0]] < f(n[1]) ? n[2] : n[3]];
+      margin += n[0];
+    }
+    total += m.weights[k] / (1 + Math.exp(-margin));
+  });
+  return total;
+}
+const denied = (key, s, nb) => risk(key, s, nb) >= M[key].cutoff;
 
 function advice(key, s) {
   const tries = [];
   for (const v of [40, 36, 33, 25]) if (v < s.dti) tries.push([`Lower debts to ${dtiLabel(v)} of income`, { dti: v }]);
-  const smaller = D.axes.loan.filter((l) => l < s.loan).slice(-2).reverse();
-  for (const l of smaller) tries.push([`Borrow less (${money(l)})`, { loan: l }]);
+  for (const share of [0.9, 0.8]) tries.push([`Borrow less (${money(s.loan * share)})`, { loan: Math.round(s.loan * share) }]);
   if (!s.co) tries.push(["Add a co-applicant", { co: 1 }]);
   for (const [label, change] of tries) if (!denied(key, { ...s, ...change }, s.nb)) return label;
-  if (key === "A") for (const nb of D.neighbourhoods)
+  if (key === "A") for (const nb of Object.keys(NBS))
     if (nb !== s.nb && !denied("A", s, nb))
       return `Not lower debts, a smaller loan or a co-applicant. <b>Only moving to a "${nb.toLowerCase()}" neighborhood</b> flips it.`;
   return "None of the small changes we tried flips it";
 }
 
+// ---- Drawing the page ----------------------------------------------------------
 function card(m) {
-  const r = risk(m.key, state, state.nb), cut = D.cutoff[m.key], bad = r >= cut;
-  const scale = Math.max(400, r * 1.15), fill = Math.min(r / scale, 1) * 100, tick = cut / scale * 100;
+  const r = risk(m.key, state, state.nb), cut = M[m.key].cutoff, bad = r >= cut;
+  const scale = Math.max(0.4, r * 1.15), fill = Math.min(r / scale, 1), tick = cut / scale * 100;
   return `<article class="panel card ${bad ? "no" : "ok"}" aria-label="${m.title}: ${bad ? "would deny" : "would approve"}">
     <div class="ct">${m.title}</div><div class="cs">${m.sub}</div>
     <div class="verdict"><span class="dot"></span>${bad ? "Would deny" : "Would approve"}</div>
     <div class="mk">Chance this AI says deny: <b>${pct(r)}</b></div>
-    <div class="meter"><div class="fill" style="transform:scaleX(${(fill / 100).toFixed(3)})"></div><div class="tick" style="left:${tick.toFixed(1)}%"></div></div>
+    <div class="meter"><div class="fill" style="transform:scaleX(${fill.toFixed(3)})"></div><div class="tick" style="left:${tick.toFixed(1)}%"></div></div>
     <div class="scale"><span>0%</span><span class="tl" style="left:${tick.toFixed(1)}%">denies above ${pct(cut)}</span></div>
     ${bad ? `<div class="fix"><small>What would change its mind?</small><div>${advice(m.key, state)}</div></div>` : ""}
   </article>`;
 }
 
 function render() {
+  const nbs = Object.keys(NBS);
   $("nb").querySelectorAll("button").forEach((b) => b.setAttribute("aria-pressed", b.dataset.nb === state.nb));
   $("dtiv").textContent = dtiLabel(state.dti);
+  const ok = state.income > 0 && state.loan > 0 && state.price > 0;
+  $("downv").textContent = ok ? (state.loan <= state.price
+    ? `Down payment: ${money(state.price - state.loan)} (${Math.round((1 - state.loan / state.price) * 100)}%)`
+    : "The loan is bigger than the home price (no down payment)") : "";
+  if (!ok) {
+    $("banner").innerHTML = "Enter an income, loan and home price above zero to see what the AIs decide.";
+    return;
+  }
   $("cards").innerHTML = MODELS.map(card).join("");
   $("tbody").innerHTML = MODELS.map((m) => {
-    const v = D.neighbourhoods.map((nb) => denied(m.key, state, nb));
+    const v = nbs.map((nb) => denied(m.key, state, nb));
     const flips = new Set(v).size > 1;
     return `<tr><th scope="row">${m.title}<span class="tag ${flips ? "flip" : ""}">${flips ? "Answer changes with the address" : "Same answer everywhere"}</span></th>` +
-      D.neighbourhoods.map((nb, i) => `<td><span class="chip ${v[i] ? "no" : "ok"}"><span class="dot"></span>${v[i] ? "Deny" : "Approve"}<em>${pct(risk(m.key, state, nb))}</em></span></td>`).join("") + "</tr>";
+      nbs.map((nb, i) => `<td><span class="chip ${v[i] ? "no" : "ok"}"><span class="dot"></span>${v[i] ? "Deny" : "Approve"}<em>${pct(risk(m.key, state, nb))}</em></span></td>`).join("") + "</tr>";
   }).join("");
-  const aFlips = new Set(D.neighbourhoods.map((nb) => denied("A", state, nb))).size > 1;
+  const aFlips = new Set(nbs.map((nb) => denied("A", state, nb))).size > 1;
   let msg;
   if (aFlips) {
     const here = denied("A", state, state.nb) && !denied("C", state, state.nb)
@@ -198,26 +226,22 @@ function render() {
 }
 
 function fillForm() {
-  const opt = (el, vals, fmt, cur) => { el.innerHTML = vals.map((v) => `<option value="${v}" ${v == cur ? "selected" : ""}>${fmt(v)}</option>`).join(""); };
-  opt($("income"), D.axes.income, (v) => money(v) + " a year", state.income);
-  opt($("loan"), D.axes.loan, money, state.loan);
-  opt($("down"), D.axes.down, (v) => v + "%", state.down);
-  opt($("lt"), D.axes.loan_type, (v) => v, state.lt);
-  $("dti").max = D.axes.dti.length - 1; $("dti").value = D.axes.dti.indexOf(state.dti);
-  $("co").checked = !!state.co;
+  $("income").value = state.income; $("loan").value = state.loan; $("price").value = state.price;
+  $("lt").innerHTML = Object.keys(LOAN_TYPES).map((v) => `<option ${v === state.lt ? "selected" : ""}>${v}</option>`).join("");
+  $("dti").value = state.dti; $("thirty").checked = !!state.thirty; $("co").checked = !!state.co;
 }
 
 async function start() {
-  try { D = await (await fetch("demo_data.json")).json(); }
-  catch (e) { $("banner").textContent = "Couldn't load the models' answers. Please refresh the page."; return; }
-  $("nb").innerHTML = D.neighbourhoods.map((nb) => `<button data-nb="${nb}" aria-pressed="false">${nb}</button>`).join("");
-  $("thead").innerHTML = `<tr><th></th>${D.neighbourhoods.map((nb) => `<th scope="col">${nb}<small>${NOTE[nb]}</small></th>`).join("")}</tr>`;
+  try { const d = await (await fetch("models.json")).json(); M = d; NBS = d.neighbourhoods; }
+  catch (e) { $("banner").textContent = "Couldn't load the AI models. Please refresh the page."; return; }
+  const nbs = Object.keys(NBS);
+  $("nb").innerHTML = nbs.map((nb) => `<button data-nb="${nb}" aria-pressed="false">${nb}</button>`).join("");
+  $("thead").innerHTML = `<tr><th></th>${nbs.map((nb) => `<th scope="col">${nb}<small>${NOTE[nb]}</small></th>`).join("")}</tr>`;
   $("nb").addEventListener("click", (e) => { const b = e.target.closest("button"); if (b) { state.nb = b.dataset.nb; render(); } });
-  $("income").onchange = (e) => { state.income = +e.target.value; render(); };
-  $("loan").onchange = (e) => { state.loan = +e.target.value; render(); };
-  $("down").onchange = (e) => { state.down = +e.target.value; render(); };
+  for (const id of ["income", "loan", "price"]) $(id).oninput = (e) => { state[id] = parseFloat(e.target.value) || 0; render(); };
   $("lt").onchange = (e) => { state.lt = e.target.value; render(); };
-  $("dti").oninput = (e) => { state.dti = D.axes.dti[+e.target.value]; render(); };
+  $("dti").oninput = (e) => { state.dti = +e.target.value; render(); };
+  $("thirty").onchange = (e) => { state.thirty = e.target.checked ? 1 : 0; render(); };
   $("co").onchange = (e) => { state.co = e.target.checked ? 1 : 0; render(); };
   $("reset").onclick = () => { state = { ...EXAMPLE, nb: state.nb }; fillForm(); render(); };
   fillForm(); render();

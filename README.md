@@ -59,7 +59,7 @@ python src/other_state.py     #    second-state check, North Carolina -> results
 python src/audit_lender.py    #    lender-by-lender audit (anonymised) -> results_lenders.md; add --lei <LEI> for one lender
 python src/charts.py          # 7. charts -> figures/
 python app/app.py             # 8. the demo app -> http://127.0.0.1:7860
-python src/export_demo.py     #    pre-compute answers for the static live demo -> docs/demo_data.json
+python src/export_models.py   #    export the real models for the live web demo -> docs/models.json
 ```
 
 Every script starts with a plain-English explanation of what it does and why.
@@ -69,7 +69,7 @@ Every script starts with a plain-English explanation of what it does and why.
 |---|---|
 | `src/` | The pipeline: download → prep → train → fix → audit → counterfactual → charts |
 | `app/` | The Gradio demo (runs the models live) |
-| `docs/` | The static live demo on GitHub Pages (pre-computed answers from the same models) |
+| `docs/` | The live web demo: the real trained models run in your browser |
 | `figures/` | Charts used in the write-up |
 | `models/` | Trained models (so the demo runs without retraining) |
 | `results_*.csv/md` | Raw result tables behind every number above |
