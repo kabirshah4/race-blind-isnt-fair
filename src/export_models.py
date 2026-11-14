@@ -35,7 +35,7 @@ def flatten(tree):
 
     def walk(n):
         if "leaf" in n:
-            nodes[n["nodeid"]] = [n["leaf"]]
+            nodes[n["nodeid"]] = [float(f"{n['leaf']:.6g}")]   # 6 significant digits: smaller file, same answers
         else:
             nodes[n["nodeid"]] = [int(n["split"][1:]), n["split_condition"], n["yes"], n["no"]]
             for c in n["children"]:

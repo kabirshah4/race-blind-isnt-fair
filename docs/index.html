@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1">
 <title>FairView · Race-Blind Isn't Fair</title>
 <link rel="icon" type="image/svg+xml" href="favicon.svg">
+<link rel="preload" href="models.json" as="fetch" crossorigin="anonymous">
 <meta name="description" content="Same person, different address. Does a race-blind mortgage AI change its answer? A live demo built on 264,340 real Georgia mortgage applications.">
 <style>
 /* Sky: a navy sky that fades into white. Navy only on actions; serif for big moments. System fonts, nothing to download. */
@@ -300,7 +301,7 @@ function fillForm() {
 }
 
 async function start() {
-  try { const d = await (await fetch("models.json")).json(); M = d; NBS = d.neighbourhoods; }
+  try { const d = await (await fetch("models.json", { credentials: "omit", mode: "cors" })).json(); M = d; NBS = d.neighbourhoods; }
   catch (e) { $("banner").textContent = "Couldn't load the AI models. Please refresh the page."; return; }
   const nbs = Object.keys(NBS);
   $("nb").innerHTML = nbs.map((nb) => `<button data-nb="${nb}" aria-pressed="false">${nb}</button>`).join("");
@@ -324,14 +325,18 @@ async function start() {
     $("who").innerHTML = `Showing real 2023 Georgia application <b>#${k + 1} of ${S.length}</b>, picked at random. The bank actually <b>${approved ? "approved" : "denied"}</b> it.`;
     fillForm(); render();
   };
-  // Not cherry-picked: across all 500 random real applicants, how often does the typical AI change its answer with the address?
-  const flips = S.filter(([income, loan, price, dti, thirty, co, lt]) => {
-    const s = { income, loan, price, dti, thirty, co, lt };
-    return new Set(Object.keys(NBS).map((nb) => denied("A", s, nb))).size > 1;
-  }).length;
-  $("randstat").innerHTML = `Across ${S.length} random real applicants, the bank-style AI changes its answer just because of the address for <b>${flips} (${Math.round(flips / S.length * 100)}%)</b>. Our fixed AI: 0, since it never sees the address.`;
   $("who").textContent = WHO_EXAMPLE;
   fillForm(); render();
+  // Not cherry-picked: across all 500 random real applicants, how often does the bank-style AI change its answer
+  // with the address? Worked out after the page is on screen, so it never delays the first paint (slow phones).
+  const stat = () => {
+    const flips = S.filter(([income, loan, price, dti, thirty, co, lt]) => {
+      const s = { income, loan, price, dti, thirty, co, lt };
+      return new Set(Object.keys(NBS).map((nb) => denied("A", s, nb))).size > 1;
+    }).length;
+    $("randstat").innerHTML = `Across ${S.length} random real applicants, the bank-style AI changes its answer just because of the address for <b>${flips} (${Math.round(flips / S.length * 100)}%)</b>. Our fixed AI: 0, since it never sees the address.`;
+  };
+  (window.requestIdleCallback || ((f) => setTimeout(f, 200)))(stat);
 }
 start();
 </script>
