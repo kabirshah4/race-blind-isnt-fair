@@ -16,19 +16,26 @@ for i, (start, who, say) in enumerate(cues):
     words = say.split()
     # Karaoke pacing: words light up at a calm ~2.5 words/second, starting 0.2 s into the line,
     # and always finish before the next line (if the slot is tight, they speed up to fit).
-    step = min(0.4, (end - start - 0.5) / max(len(words), 1))
+    # Smooth pacing: the colour flows across the line at a relaxed ~2.2 words/second
+    # (each word fades in over a little more than one word's time, so it reads as one sweep),
+    # never running past the next line. A thin bar under the line shows the time left.
+    step = min(0.45, (end - start - 0.6) / max(len(words), 1))
     spans = " ".join(f'<i id="c{i}w{j}">{html.escape(w)}</i>' for j, w in enumerate(words))
-    els.append(f'<div class="cue" id="cue{i}"><b style="color:{col}">{who.upper()}</b><span>{spans}</span></div>')
+    els.append(f'<div class="cue" id="cue{i}"><b style="color:{col}">{who.upper()}</b><span>{spans}</span>'
+               f'<em class="tbar"><u id="c{i}bar" style="background:{col}"></u></em></div>')
     tw.append(f'tl.set("#cue{i}", {{ opacity: 1 }}, {start}).set("#cue{i}", {{ opacity: 0 }}, {end - 0.05});')
+    tw.append(f'tl.fromTo("#c{i}bar", {{ scaleX: 0 }}, {{ scaleX: 1, duration: {end - start - 0.1:.2f}, ease: "none" }}, {start});')
     for j in range(len(words)):
-        tw.append(f'tl.set("#c{i}w{j}", {{ color: "{col}" }}, {start + 0.2 + j * step:.2f});')
+        tw.append(f'tl.fromTo("#c{i}w{j}", {{ color: "rgba(255,255,255,0.5)" }}, {{ color: "{col}", duration: {step * 1.6:.2f}, ease: "none" }}, {start + 0.2 + j * step:.2f});')
 (dst / "compositions" / "cue.html").write_text(f'''<template>
   <style>
     #root {{ position: absolute; inset: 0; pointer-events: none; font-family: Inter, sans-serif; }}
     .band {{ position: absolute; left: 0; right: 0; bottom: 0; height: 250px; background: rgba(0,0,0,.86); }}
     .cue {{ position: absolute; left: 80px; right: 80px; bottom: 40px; height: 170px; color: #fff; font-size: 44px; line-height: 1.25; opacity: 0; display: flex; gap: 30px; align-items: center; }}
     .cue b {{ font-size: 40px; min-width: 200px; }}
-    .cue i {{ font-style: normal; color: rgba(255,255,255,.55); }}
+    .cue i {{ font-style: normal; color: rgba(255,255,255,.5); }}
+    .cue .tbar {{ position: absolute; left: 230px; right: 0; bottom: -14px; height: 4px; border-radius: 2px; background: rgba(255,255,255,.12); overflow: hidden; }}
+    .cue .tbar u {{ display: block; height: 100%; transform-origin: left center; transform: scaleX(0); }}
     .clock {{ position: absolute; right: 30px; top: 24px; color: #fff; background: rgba(0,0,0,.7); padding: 8px 16px; border-radius: 10px; font-size: 34px; font-family: "IBM Plex Mono", monospace; }}
   </style>
   <div id="root" data-composition-id="cue" data-width="1920" data-height="1080">
