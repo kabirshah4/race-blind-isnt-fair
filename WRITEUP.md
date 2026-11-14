@@ -1,7 +1,7 @@
 # Race-Blind Isn't Fair: Auditing a Mortgage-Approval Model for Hidden Redlining
 
 **Track:** AI + Finance
-**Team:** Kabir Shah, [partner's name]
+**Team:** Kabir Shah, Vishnu Veer
 **Starting point:** Our own idea (related to suggested project 4.2.3, but on real 2022–2023 US mortgage data instead of German Credit)
 
 *This project is a prototype and is not financial advice.*
