@@ -34,8 +34,13 @@ NUMERIC_FEATURES = [
     "tract_owner_occupied_units", "tract_one_to_four_family_homes",
     "tract_median_age_of_housing_units",
 ]
-CATEGORICAL_FEATURES = ["loan_type", "preapproval", "conforming_loan_limit",
-                        "submission_of_application", "initially_payable_to_institution"]
+# Two more leaks we caught later (an independent review found them):
+#   preapproval: denied pre-approval requests are filed under a different action code
+#     (7) that we never download, so "asked for pre-approval" = 0% denied in our data.
+#   initially_payable_to_institution: code 3 means "not applicable", which mostly
+#     happens when no loan was made, so it is 83% denied.
+# Both give away the answer, so neither is a feature.
+CATEGORICAL_FEATURES = ["loan_type", "conforming_loan_limit", "submission_of_application"]
 # Features that describe the NEIGHBOURHOOD, not the applicant: candidate proxies.
 TRACT_FEATURES = [c for c in NUMERIC_FEATURES if c.startswith(("tract_", "ffiec_"))]
 PROTECTED = ["race_group", "sex_group", "age_group"]

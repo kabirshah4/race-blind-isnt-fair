@@ -50,22 +50,22 @@ NEIGHBOURHOODS = {
 NB_NOTE = {"Mostly white": "under 20% minority", "Mixed": "40–60% minority", "Mostly minority": "over 90% minority"}
 LOAN_TYPES = {"Conventional": "1", "FHA (government-backed)": "2", "VA (veterans)": "3", "USDA (rural)": "4"}
 
-# The borderline example: a real case found by search, where only the address flips model A.
-MAYA = dict(income=100, loan_amount=100, property_value=125, dti=46, loan_type="Conventional",
-            thirty_year=True, coapplicant=False, preapproval=False)
+# The example applicant is CONSTRUCTED (not a real person): one of 174 combinations we
+# tested where only the address flips model A. Chosen for the widest margin on both sides.
+MAYA = dict(income=60, loan_amount=100, property_value=125, dti=42, loan_type="Conventional",
+            thirty_year=True, coapplicant=False)
 
 
 # ----------------------------------------------------------------------------- model logic
 def build_applicant(income, loan_amount, property_value, dti, loan_type, thirty_year,
-                    coapplicant, preapproval, neighbourhood):
+                    coapplicant, neighbourhood):
     """Turn the form inputs into one row with the same columns the models were trained on."""
     row = {
         "income": income, "loan_amount": loan_amount, "property_value": property_value,
         "ltv": min(loan_amount / max(property_value, 1) * 100, 150), "dti": dti,
         "loan_term_360": int(thirty_year), "has_coapplicant": int(coapplicant),
-        "loan_type": LOAN_TYPES[loan_type], "preapproval": "1" if preapproval else "2",
-        "conforming_loan_limit": "C" if loan_amount <= 766 else "NC",
-        "submission_of_application": "1", "initially_payable_to_institution": "1",
+        "loan_type": LOAN_TYPES[loan_type], "conforming_loan_limit": "C" if loan_amount <= 766 else "NC",
+        "submission_of_application": "1",
         **NEIGHBOURHOODS[neighbourhood].to_dict(),
     }
     return pd.DataFrame([row])
@@ -164,15 +164,13 @@ def banner(grid, neighbourhood):
                f'Our fixed AI gives this person the same answer everywhere.{now}')
     else:
         msg = ("For this applicant, neither AI changes its answer with the address. "
-               "Press <b>Load the borderline example</b> to see a case where it does.")
+               "Press <b>Reset to the example applicant</b> to see a case where it does.")
     return f'<div class="fl-banner" role="status"><span class="fl-bk">What you’re seeing</span><p>{msg}</p></div>'
 
 
-def judge(income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant,
-          preapproval, neighbourhood):
+def judge(income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant, neighbourhood):
     inputs = dict(income=income or 0, loan_amount=loan_amount or 0, property_value=property_value or 1,
-                  dti=dti, loan_type=loan_type, thirty_year=thirty_year, coapplicant=coapplicant,
-                  preapproval=preapproval)
+                  dti=dti, loan_type=loan_type, thirty_year=thirty_year, coapplicant=coapplicant)
     applicant = build_applicant(**inputs, neighbourhood=neighbourhood)
     cards = []
     for key, title, sub, bundle in MODELS:
@@ -297,9 +295,9 @@ with gr.Blocks(title="FairLens") as demo:
             out_cards = gr.HTML()
             out_strip = gr.HTML()
         with gr.Column(scale=4, elem_classes=["fl-panel", "glass"]):
-            gr.HTML('<div class="fl-ptitle">The applicant</div><div class="fl-psub">Already filled in with a real borderline case. '
+            gr.HTML('<div class="fl-ptitle">The applicant</div><div class="fl-psub">Filled in with a constructed borderline example (not a real person). '
                     'Change anything and both AIs update instantly.</div>')
-            maya = gr.Button("Load the borderline example", elem_id="fl-maya", variant="secondary")
+            maya = gr.Button("Reset to the example applicant", elem_id="fl-maya", variant="secondary")
             income = gr.Number(MAYA["income"], label="Yearly income ($ thousands)", minimum=1)
             with gr.Row():
                 loan_amount = gr.Number(MAYA["loan_amount"], label="Loan ($K)", minimum=1)
@@ -308,13 +306,13 @@ with gr.Blocks(title="FairLens") as demo:
             loan_type = gr.Dropdown(list(LOAN_TYPES), value=MAYA["loan_type"], label="Loan type")
             thirty_year = gr.Checkbox(MAYA["thirty_year"], label="30-year mortgage")
             coapplicant = gr.Checkbox(MAYA["coapplicant"], label="Has a co-applicant")
-            preapproval = gr.Checkbox(MAYA["preapproval"], label="Asked for pre-approval")
-    gr.HTML("""<div class="fl-foot">Tested on 117,547 real 2023 applications: the typical AI wrongly flagged qualified Black applicants
-      <b>2.5×</b> as often as qualified white applicants, mostly through neighborhood data. Our fixed AI brought that to
-      <b>1.05×</b> (no measurable gap) while keeping 97% of the accuracy.<br>
+    gr.HTML("""<div class="fl-foot">Our fixed AI can’t see the neighborhood at all, so here its answer can’t change with the address by design.
+      What matters is the result across all 117,547 real 2023 applications: the typical AI wrongly flagged qualified Black applicants
+      <b>3.0×</b> as often as qualified white applicants; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score.
+      The trade-off: qualified white applicants are flagged a little more often (4.0% → 5.6%).<br>
       Prototype built for the Veritas AI High School Hackathon. Not financial advice.</div>""")
 
-    fields = [income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant, preapproval, neighbourhood]
+    fields = [income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant, neighbourhood]
     outs = [out_banner, out_cards, out_strip]
     # Speed: sliders update on release; every event drops stale calls and skips the loading overlay.
     for comp in fields:
@@ -323,7 +321,7 @@ with gr.Blocks(title="FairLens") as demo:
         else:
             comp.change(judge, fields, outs, show_progress="hidden", trigger_mode="always_last")
     maya.click(lambda: [MAYA[k] for k in ("income", "loan_amount", "property_value", "dti", "loan_type",
-                                          "thirty_year", "coapplicant", "preapproval")],
+                                          "thirty_year", "coapplicant")],
                None, fields[:-1])
     demo.load(judge, fields, outs, show_progress="hidden")
 

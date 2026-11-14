@@ -81,23 +81,24 @@ def chart_the_fix():
     r = pd.read_csv(ROOT / "results_fix.csv")
     lo_hi = r["95% range"].str.split("–", expand=True).astype(float)
     ratio = r["Black false alarms vs White"]
-    names = ["A. Full model", "B. Remove\nneighbourhood", "C. + Fairness\ntraining"]
-    fig, ax = plt.subplots(figsize=(7.5, 4))
-    colors = [ACCENT, "#d97706", GOOD]
-    bars = ax.bar(names, ratio, color=colors, width=0.55,
+    names = {"A": "A. Full model", "B2": "B2. Drop only\n% minority", "B": "B. Drop all\nneighbourhood", "C": "C. + Fairness\ntraining"}
+    labels = [names[m.split(".")[0]] for m in r["model"]]
+    fig, ax = plt.subplots(figsize=(8.5, 4.2))
+    colors = [ACCENT, "#ea580c", "#d97706", GOOD][: len(r)]
+    bars = ax.bar(labels, ratio, color=colors, width=0.55,
                   yerr=[ratio - lo_hi[0], lo_hi[1] - ratio], capsize=6, ecolor=INK)
     for bar, v, auc in zip(bars, ratio, r["PR-AUC"]):
-        ax.text(bar.get_x() + bar.get_width() / 2, v + 0.22, f"{v:.2f}×",
+        ax.text(bar.get_x() + bar.get_width() / 2, v + 0.24, f"{v:.2f}×",
                 ha="center", fontsize=14, fontweight="bold", color=INK)
         ax.text(bar.get_x() + bar.get_width() / 2, 0.08, f"PR-AUC {auc:.3f}",
-                ha="center", fontsize=9.5, color="white")
+                ha="center", fontsize=9, color="white")
     ax.axhline(1, color=INK, lw=1, ls=":")
-    ax.text(2.42, 1.04, "equal", fontsize=9, color=INK)
+    ax.text(len(r) - 0.55, 1.05, "equal", fontsize=9, color=INK)
     ax.set_ylabel("Qualified Black applicants wrongly\nflagged, vs. white applicants (×)")
-    ax.set_ylim(0, 3.3)
-    kept = r["PR-AUC"].iloc[2] / r["PR-AUC"].iloc[0]  # accuracy kept by the fair model
-    ax.set_title(f"Race-blind models: false-alarm gap cut from {ratio.iloc[0]:.1f}× to {ratio.iloc[2]:.2f}×\n"
-                 f"while keeping {kept:.0%} of the accuracy (PR-AUC)",
+    ax.set_ylim(0, max(ratio) + 0.7)
+    kept = r["PR-AUC"].iloc[-1] / r["PR-AUC"].iloc[0]
+    ax.set_title(f"Race-blind models: false-alarm gap cut from {ratio.iloc[0]:.1f}× to {ratio.iloc[-1]:.2f}×\n"
+                 f"while keeping {kept:.0%} of the PR-AUC (2023 test data, 95% ranges)",
                  loc="left", fontsize=12, color=INK)
     save(fig, "3_the_fix.png")
 

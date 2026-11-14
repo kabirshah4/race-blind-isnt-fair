@@ -314,3 +314,28 @@ Same person, same finances. Only the address changed, and model A flipped.
 - AI tools: Claude Code (helped write the cleaning and modelling code; we
   reviewed and can explain every step)
 - *Prototype only. This project is not financial advice.*
+
+---
+
+### Step 10: An independent review, and a third leak (Sat ~2 AM)
+We had a separate AI "judge" grade the project cold, using the official rules. It scored us
+81/100 and found problems. We fixed all of them:
+
+| What the judge found | What we did |
+|---|---|
+| **Leak #3:** `preapproval` = 0% denied (denied pre-approval requests use action code 7, which we never download) and `initially_payable_to_institution` code 3 = 83% denied | Removed both from the model (`prep.py`), re-ran everything |
+| Two headline numbers couldn't be reproduced from the code | New `src/counterfactual.py`; the difference-vs-ratio comparison now lives in `fix.py` |
+| The "85% flip" was from a favourable subset | We now report it for **all** wrongly flagged applicants (53%), plus white applicants (22%) |
+| The fairness rule was chosen by looking at 2023 test data | `fix.py` now picks it on a **2022 validation split** only |
+| Costs of the fix weren't shown | `results_fix.md` now has false alarms, recall and precision by group |
+| Wording: "accuracy" (really PR-AUC), "no measurable gap", "real borderline case", SHAP credited but unused | All fixed; demo example labelled as constructed |
+
+**Final numbers (after all leak fixes):** model PR-AUC 0.516 (DTI rule 0.342). False-alarm gap,
+Black vs white: A 3.01× → drop % minority 2.32× → drop all neighbourhood 1.88× → fairness-trained
+1.21× (95% CI 1.14–1.27), keeping 97% of the PR-AUC. Cost: white false alarms 4.0% → 5.6%.
+
+**Lesson for Q&A:** removing the leak *lowered* our model's score but made the fairness finding
+*stronger* (2.5× → 3.0×). Honest numbers beat impressive ones.
+
+**Note:** the two explainer videos (Project-Explainer*.mp4) were made before this fix and show the
+old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.

@@ -94,6 +94,11 @@ def main():
     # Baseline 2: the classic lending rule.
     dti_rule = (test.dti > 43).astype(int).to_numpy()
     results.append(evaluate("Baseline: deny if DTI > 43%", y_test_denied, test.dti.to_numpy(), dti_rule))
+    # Baseline 3, a fairer comparison: the DTI rule flagging the SAME share of people as the
+    # models (~10%, the highest-DTI applicants), so precision/recall are compared like-for-like.
+    dti_cut = np.quantile(train.dti, 1 - y_train_denied.mean())
+    dti_matched = (test.dti > dti_cut).astype(int).to_numpy()
+    results.append(evaluate(f"Baseline: highest-DTI ~10% (DTI > {dti_cut:.0f}%)", y_test_denied, test.dti.to_numpy(), dti_matched))
 
     # To compare fairly with the rule, each model flags the SAME share of 2023
     # applicants that we expect to be denied (the 2022 denial rate). We pick that

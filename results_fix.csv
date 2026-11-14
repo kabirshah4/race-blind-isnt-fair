@@ -1,4 +1,5 @@
 model,PR-AUC,Black false alarms vs White,95% range,Hispanic vs White,flagged %
-A. Full model,0.617,2.54,2.40–2.70,1.48,10.0
-B. No neighbourhood,0.613,1.56,1.46–1.65,1.24,9.7
-C. Fairness-trained,0.597,1.05,0.99–1.12,0.92,9.6
+A. Full model,0.516,3.01,2.86–3.17,1.61,10.3
+B2. Drop only % minority,0.513,2.32,2.19–2.43,1.41,10.2
+B. No neighbourhood,0.511,1.88,1.79–1.98,1.32,10.1
+C. Fairness-trained (ratio ≥ 0.9),0.501,1.21,1.14–1.27,0.96,9.5
