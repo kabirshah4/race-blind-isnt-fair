@@ -30,9 +30,19 @@ LENGTH = 118.0
 # recording -> (cut start s, cut end s, where it starts in the video s, gain dB)
 CLIPS = {
     "vishnu-1": (2.40, 22.30, 0.00, 0),
-    "kabir-pt1": (0.55, 50.60, 19.81, 0),
+    # Kabir's re-recorded lines (phone mic, lossless), one clip per line so each starts on its cue
+    "kabir2-pt1#1": (4.69, 9.00, 20.00, 0),
+    "kabir2-pt1#2": (10.07, 15.70, 25.00, 0),
+    "kabir2-pt1#3": (17.11, 22.50, 32.00, 0),
+    "kabir2-pt1#4": (23.19, 31.30, 38.00, 0),
+    "kabir2-pt1#5": (33.31, 38.60, 48.00, 0),
+    "kabir2-pt1#6": (38.91, 41.20, 54.05, 0),
+    "kabir2-pt1#7": (42.13, 46.10, 57.00, 0),
+    "kabir2-pt1#8": (47.73, 50.30, 62.85, 0),
+    "kabir2-pt1#9": (50.83, 54.70, 66.00, 0),
+    "kabir2-pt2#1": (6.15, 11.50, 103.85, 0),
+    "kabir2-pt2#2": (16.19, 19.75, 114.00, 0),
     "vishnu-2": (2.40, 34.20, 70.82, 0),
-    "kabir-pt2": (4.50, 18.30, 103.76, 0),
     # "vishnu-3" (the line said together) is left out: two voices on top of each other blurred "isn't", so Kabir says it solo
 }
 # sound effect -> list of (video time s, gain dB)
@@ -45,7 +55,7 @@ EFFECTS = {
     "click.mp3": [(54.1, -8), (59.1, -8), (62.9, -8), (74.1, -8), (77.1, -8), (82.0, -8)],   # real demo clicks
     "impact-bass-2.mp3": [(83.0, -14)],                         # 1 in 9
     "key-press.mp3": [(94.9, -12), (95.9, -12), (96.9, -12)],   # bars rising
-    "chime.mp3": [(113.2, -14)],                                # right after the final line
+    "chime.mp3": [(110.9, -12)],                                # as the slogan appears on screen
 }
 
 
@@ -73,8 +83,9 @@ def clean(name):
     consonants live, keep his REAL voice, gently denoised. Above 5.5 kHz, add only the
     brightness that VoiceFixer (AI) rebuilt. That way the AI can't blur any words."""
     raw, out = V / f"{name}-raw.m4a", V / f"{name}-ready.wav"
-    if not name.startswith("kabir"):
-        run(["ffmpeg", "-y", "-v", "error", "-i", str(raw), "-af", LIGHT + "," + LEVEL, "-ar", str(SR), "-ac", "1", str(out)])
+    if not name.startswith("kabir-"):   # Vishnu and Kabir's lossless re-record: light cleanup only
+        match = ",equalizer=f=7000:t=h:w=0.7:g=-5" if name.startswith("kabir2") else ""   # Kabir's phone mic is brighter; match Vishnu
+        run(["ffmpeg", "-y", "-v", "error", "-i", str(raw), "-af", LIGHT + match + "," + LEVEL, "-ar", str(SR), "-ac", "1", str(out)])
         return out
     vf = V / f"{name}-vf.wav"
     if not vf.exists():
@@ -137,8 +148,8 @@ def music_bed():
 def main():
     n = int(LENGTH * SR)
     voice, fx = np.zeros(n), np.zeros(n)
-    for name, (a, b, at, g) in CLIPS.items():
-        place(voice, clean(name), at, g, start=a, end=b)
+    for key, (a, b, at, g) in CLIPS.items():
+        place(voice, clean(key.split("#")[0]), at, g, start=a, end=b)
     for f, hits in EFFECTS.items():
         for at, g in hits:
             place(fx, SFX / f, at, g)
