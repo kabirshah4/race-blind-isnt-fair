@@ -100,7 +100,7 @@ ICON_OK = ('<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" 
            '<path d="M6 10.3l2.6 2.6L14.2 7" fill="none" stroke="#06110C" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>')
 ICON_NO = ('<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="currentColor"/>'
            '<path d="M7 7l6 6M13 7l-6 6" fill="none" stroke="#1A0707" stroke-width="2.2" stroke-linecap="round"/></svg>')
-ICON_INFO = ('<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>'
+_UNUSED_ICON = ('<svg viewBox="0 0 20 20" aria-hidden="true"><circle cx="10" cy="10" r="9" fill="none" stroke="currentColor" stroke-width="1.8"/>'
              '<path d="M10 9v5M10 6.2v.2" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>')
 
 
@@ -119,7 +119,7 @@ def card(title, subtitle, risk, cutoff, advice):
     return f"""
     <article class="fl-card glass fl-{state}" aria-label="{title}: {verdict}">
       <div class="fl-ct">{title}</div><div class="fl-cs">{subtitle}</div>
-      <div class="fl-verdict">{ICON_NO if flagged else ICON_OK}<span>{verdict}</span></div>
+      <div class="fl-verdict"><i></i>{verdict}</div>
       <div class="fl-mk">Chance this AI says deny: <b>{risk:.0%}</b></div>
       <div class="fl-meter" role="img" aria-label="Chance of denial {risk:.0%}; this AI denies above {cutoff:.0%}">
         <div class="fl-fill" style="width:{fill:.1f}%"></div>
@@ -143,7 +143,7 @@ def strip(grid):
     rows = ""
     for key, title, _, _ in MODELS:
         cells = "".join(
-            f'<td><span class="fl-chip fl-{"no" if r >= c else "ok"}">{ICON_NO if r >= c else ICON_OK}'
+            f'<td><span class="fl-chip fl-{"no" if r >= c else "ok"}"><i></i>'
             f'{"Deny" if r >= c else "Approve"}<em>{r:.0%}</em></span></td>' for n, r, c in grid[key])
         flips = len({r >= c for _, r, c in grid[key]}) > 1
         tag = '<span class="fl-tag flip">Answer changes with the address</span>' if flips else '<span class="fl-tag">Same answer everywhere</span>'
@@ -165,7 +165,7 @@ def banner(grid, neighbourhood):
     else:
         msg = ("For this applicant, neither AI changes its answer with the address. "
                "Press <b>Load the borderline example</b> to see a case where it does.")
-    return f'<div class="fl-banner glass" role="status">{ICON_INFO}<p><span class="fl-bk">What you’re seeing</span>{msg}</p></div>'
+    return f'<div class="fl-banner" role="status"><span class="fl-bk">What you’re seeing</span><p>{msg}</p></div>'
 
 
 def judge(income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant,
@@ -186,109 +186,95 @@ def judge(income, loan_amount, property_value, dti, loan_type, thirty_year, coap
 
 
 CSS = """
-/* Liquid glass, dark. Glass = translucent fill + backdrop blur + bright top edge + deep shadow,
-   floating over soft colour glows so the blur has something to refract. */
+/* Quiet dark. No blur, no glows: flat surfaces, hairline borders, small status dots.
+   Everything here is cheap to paint, so scrolling and updates stay smooth. */
 :root, .dark {
-  --ink:#EEF3F9; --muted:#A3B1C4; --line:rgba(255,255,255,.12);
-  --ok:#3EE59A; --ok-bg:rgba(62,229,154,.14); --no:#FF7A70; --no-bg:rgba(255,122,112,.15); --focus:#7CC4FF;
-  --body-background-fill:#070B14; --background-fill-primary:transparent; --background-fill-secondary:rgba(255,255,255,.05);
+  --bg:#0B0E13; --surface:#11151C; --ink:#E8EDF3; --muted:#8B97A8; --line:#1F2630; --line2:#2A323E;
+  --ok:#55C28E; --no:#EC7A6F; --accent:#8AB4F8; --focus:#8AB4F8;
+  --body-background-fill:var(--bg); --background-fill-primary:var(--surface); --background-fill-secondary:var(--surface);
   --block-background-fill:transparent; --block-border-color:transparent; --block-border-width:0px; --block-label-text-color:var(--muted);
   --block-title-text-color:var(--muted); --body-text-color:var(--ink); --body-text-color-subdued:var(--muted);
-  --input-background-fill:rgba(255,255,255,.07); --input-border-color:rgba(255,255,255,.14); --input-border-color-focus:var(--focus);
-  --border-color-primary:rgba(255,255,255,.12); --checkbox-background-color:rgba(255,255,255,.08); --checkbox-border-color:rgba(255,255,255,.3);
-  --checkbox-background-color-selected:#7CC4FF; --slider-color:#7CC4FF; --neutral-200:rgba(255,255,255,.18);
-  --button-secondary-background-fill:rgba(255,255,255,.12); --button-secondary-background-fill-hover:rgba(255,255,255,.18);
-  --button-secondary-text-color:var(--ink); --button-secondary-border-color:rgba(255,255,255,.2);
+  --input-background-fill:#0E1218; --input-border-color:var(--line2); --input-border-color-focus:var(--focus); --input-shadow:none;
+  --border-color-primary:var(--line); --checkbox-background-color:#0E1218; --checkbox-border-color:#3A4452;
+  --checkbox-background-color-selected:var(--accent); --slider-color:var(--accent); --neutral-200:var(--line2);
+  --button-secondary-background-fill:transparent; --button-secondary-background-fill-hover:#171C24;
+  --button-secondary-text-color:var(--ink); --button-secondary-border-color:var(--line2); --shadow-drop:none; --shadow-drop-lg:none;
 }
-body, .gradio-container, gradio-app {
-  background: radial-gradient(900px 560px at 12% 6%, rgba(56,152,248,.28), transparent 62%),
-              radial-gradient(760px 520px at 88% 22%, rgba(150,110,255,.24), transparent 62%),
-              radial-gradient(900px 620px at 45% 104%, rgba(40,200,150,.18), transparent 62%), #070B14 !important;
-  background-attachment: fixed !important; }
-.gradio-container { max-width: 1240px !important; margin: 0 auto !important; font-family: "IBM Plex Sans", system-ui, sans-serif !important; color: var(--ink); }
-.glass { background: linear-gradient(180deg, rgba(255,255,255,.10), rgba(255,255,255,.04)) !important;
-  -webkit-backdrop-filter: blur(26px) saturate(170%); backdrop-filter: blur(26px) saturate(170%);
-  border: 1px solid rgba(255,255,255,.13) !important; border-radius: 22px !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.22), 0 24px 60px rgba(0,0,0,.40) !important; }
-.fl-hero { padding: 30px 6px 6px; }
-.fl-eyebrow { font-size: 14px; font-weight: 600; color: var(--muted); }
-.fl-hero h1 { font-size: clamp(32px, 4.4vw, 50px); line-height: 1.04; letter-spacing: -0.025em; font-weight: 700; margin: 8px 0 10px; color: #fff; }
-.fl-hero p { font-size: 18px; line-height: 1.5; color: var(--muted); max-width: 780px; margin: 0; }
-.fl-hero p b { color: #fff; }
-.fl-banner { display: flex; gap: 14px; align-items: flex-start; padding: 16px 20px; margin: 6px 0 4px; color: #BFE3FF; }
-.fl-banner svg { width: 24px; height: 24px; flex: none; margin-top: 2px; }
-.fl-banner p { margin: 0; font-size: 17px; line-height: 1.5; color: var(--ink); }
-.fl-banner .fl-bk { display: block; font-size: 13px; font-weight: 700; color: #9CD2FF; margin-bottom: 2px; }
-.fl-banner .ok { color: var(--ok); font-weight: 700; } .fl-banner .no { color: var(--no); font-weight: 700; }
-.fl-step { display: flex; align-items: center; gap: 10px; font-size: 15px; font-weight: 700; color: var(--ink); margin: 6px 2px 10px; }
-.fl-step span { display: grid; place-items: center; width: 26px; height: 26px; border-radius: 50%; background: rgba(124,196,255,.18);
-  color: #BFE3FF; font-size: 14px; border: 1px solid rgba(124,196,255,.35); }
-/* step 1: neighbourhood segmented control (a glass track with a brighter glass thumb) */
-#fl-nb .wrap { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 6px; padding: 6px; border-radius: 18px;
-  background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.12); box-shadow: inset 0 1px 0 rgba(255,255,255,.12); }
-#fl-nb label { justify-content: center; border: 0 !important; border-radius: 13px !important; padding: 13px 10px !important; min-height: 48px;
-  font-size: 16px; font-weight: 600; color: var(--muted) !important; background: transparent !important; cursor: pointer;
-  transition: background-color 160ms ease, color 160ms ease, transform 100ms ease-out; }
-#fl-nb label:hover { color: var(--ink) !important; background: rgba(255,255,255,.06) !important; }
-#fl-nb label:active { transform: scale(0.97); }
-#fl-nb label.selected { color: #fff !important; background: rgba(255,255,255,.18) !important;
-  box-shadow: inset 0 1px 0 rgba(255,255,255,.35), 0 6px 18px rgba(0,0,0,.30); }
+body, gradio-app, .gradio-container { background: var(--bg) !important; }
+.gradio-container { max-width: 1180px !important; margin: 0 auto !important; font-family: "IBM Plex Sans", system-ui, sans-serif !important;
+  color: var(--ink); -webkit-font-smoothing: antialiased; }
+.glass { background: var(--surface) !important; border: 1px solid var(--line) !important; border-radius: 12px !important; box-shadow: none !important; }
+.fl-hero { padding: 34px 2px 4px; }
+.fl-eyebrow { font-size: 13px; font-weight: 500; color: var(--muted); }
+.fl-hero h1 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; margin: 10px 0 10px; color: #fff; }
+.fl-hero p { font-size: 17px; line-height: 1.55; color: var(--muted); max-width: 720px; margin: 0; font-weight: 400; }
+.fl-hero p b { color: var(--ink); font-weight: 500; }
+.fl-banner { padding: 14px 2px 6px; border-top: 1px solid var(--line); margin-top: 18px; }
+.fl-banner .fl-bk { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
+.fl-banner p { margin: 4px 0 0; font-size: 16px; line-height: 1.55; color: var(--ink); font-weight: 400; max-width: 900px; }
+.fl-banner b { font-weight: 600; color: #fff; }
+.fl-banner .ok { color: var(--ok); font-weight: 600; } .fl-banner .no { color: var(--no); font-weight: 600; }
+.fl-step { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink); margin: 14px 0 8px; }
+.fl-step span { color: var(--muted); font-variant-numeric: tabular-nums; }
+.fl-step span::after { content: "."; }
+/* neighbourhood switch: a thin segmented control */
+#fl-nb .wrap { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 10px;
+  background: var(--surface); border: 1px solid var(--line); }
+#fl-nb label { justify-content: center; border: 0 !important; border-radius: 7px !important; padding: 10px 8px !important; min-height: 44px;
+  font-size: 15px; font-weight: 500; color: var(--muted) !important; background: transparent !important; cursor: pointer; box-shadow: none !important;
+  transition: background-color 120ms ease, color 120ms ease; }
+#fl-nb label:hover { color: var(--ink) !important; }
+#fl-nb label:active { transform: scale(0.98); }
+#fl-nb label.selected { color: #fff !important; background: #1E2530 !important; }
 #fl-nb input { position: absolute; opacity: 0; }
-#fl-nb label:has(input:focus-visible) { outline: 3px solid var(--focus); outline-offset: 2px; }
-/* step 2: the two decisions */
-.fl-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
-.fl-card { padding: 20px 22px !important; position: relative; overflow: hidden; }
-.fl-card::before { content: ""; position: absolute; inset: 0 0 auto 0; height: 3px; background: var(--state); opacity: .9; }
-.fl-ok { --state: var(--ok); --state-bg: var(--ok-bg); }
-.fl-no { --state: var(--no); --state-bg: var(--no-bg); }
-.fl-ct { font-size: 20px; font-weight: 700; color: #fff; letter-spacing: -0.01em; }
-.fl-cs { font-size: 14px; color: var(--muted); margin-top: 2px; }
-.fl-verdict { display: inline-flex; align-items: center; gap: 10px; margin: 16px 0 14px; padding: 9px 16px 9px 10px; border-radius: 999px;
-  background: var(--state-bg); color: var(--state); font-size: 24px; font-weight: 700; border: 1px solid color-mix(in srgb, var(--state) 35%, transparent); }
-.fl-verdict svg, .fl-chip svg { width: 24px; height: 24px; flex: none; }
-.fl-mk { font-size: 15px; color: var(--muted); font-variant-numeric: tabular-nums; }
-.fl-mk b { color: #fff; font-size: 20px; }
-.fl-meter { position: relative; height: 12px; background: rgba(255,255,255,.10); border-radius: 6px; margin: 10px 0 6px; }
-.fl-fill { position: absolute; inset: 0 auto 0 0; background: var(--state); border-radius: 6px; box-shadow: 0 0 0 1px rgba(0,0,0,.2);
-  transition: width 260ms cubic-bezier(.2,.8,.2,1); }
-.fl-tick { position: absolute; top: -6px; bottom: -6px; width: 2px; background: #fff; border-radius: 1px; }
-.fl-scale { position: relative; height: 18px; font-size: 12px; color: var(--muted); }
-.fl-tlab { position: absolute; transform: translateX(-50%); white-space: nowrap; font-weight: 600; color: var(--ink); }
-.fl-fix { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); display: flex; flex-direction: column; gap: 3px; }
-.fl-fixk { font-size: 13px; font-weight: 700; color: var(--muted); }
-.fl-fixv { font-size: 16px; font-weight: 500; line-height: 1.4; color: var(--ink); }
-.fl-fixv b { color: #fff; }
-/* step 3: every address at once */
-.fl-strip { padding: 16px 18px !important; margin-top: 16px; }
+#fl-nb label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
+/* the two decisions */
+.fl-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+.fl-card { padding: 18px 20px !important; }
+.fl-ok { --state: var(--ok); } .fl-no { --state: var(--no); }
+.fl-ct { font-size: 16px; font-weight: 600; color: #fff; }
+.fl-cs { font-size: 13px; color: var(--muted); margin-top: 2px; }
+.fl-verdict { display: flex; align-items: center; gap: 9px; margin: 18px 0 14px; font-size: 22px; font-weight: 600; color: var(--state); letter-spacing: -0.01em; }
+.fl-verdict i, .fl-chip i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--state); flex: none; }
+.fl-mk { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
+.fl-mk b { color: var(--ink); font-weight: 600; }
+.fl-meter { position: relative; height: 4px; background: var(--line2); border-radius: 2px; margin: 10px 0 6px; }
+.fl-fill { position: absolute; inset: 0 auto 0 0; background: var(--state); border-radius: 2px; }
+.fl-tick { position: absolute; top: -5px; bottom: -5px; width: 1.5px; background: var(--ink); }
+.fl-scale { position: relative; height: 16px; font-size: 12px; color: var(--muted); }
+.fl-tlab { position: absolute; transform: translateX(-50%); white-space: nowrap; }
+.fl-fix { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
+.fl-fixk { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.fl-fixv { display: block; font-size: 15px; line-height: 1.45; color: var(--ink); margin-top: 2px; }
+.fl-fixv b { color: #fff; font-weight: 600; }
+/* every address at once */
+.fl-strip { padding: 4px 18px 8px !important; margin-top: 12px; }
 .fl-scroll { overflow-x: auto; }
 .fl-strip table { width: 100%; border-collapse: collapse; border: 0 !important; font-variant-numeric: tabular-nums; table-layout: fixed; background: transparent !important; }
 .fl-strip thead, .fl-strip tbody, .fl-strip tr { border: 0 !important; background: transparent !important; }
 .fl-strip th, .fl-strip td { text-align: left; padding: 11px 6px !important; border: 0 !important; border-top: 1px solid var(--line) !important;
   vertical-align: middle; background: transparent !important; color: var(--ink); }
-.fl-strip thead th { border-top: 0 !important; font-size: 14px; font-weight: 700; }
-.fl-strip thead small { display: block; font-weight: 500; color: var(--muted); font-size: 12px; }
+.fl-strip thead th { border-top: 0 !important; font-size: 13px; font-weight: 500; }
+.fl-strip thead small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
 .fl-strip th:first-child { width: 30%; }
-.fl-strip tbody th { font-size: 15px; font-weight: 700; color: #fff; }
-.fl-chip { display: inline-flex; align-items: center; gap: 6px; padding: 5px 11px 5px 5px; border-radius: 999px; font-size: 14px; font-weight: 700;
-  background: var(--state-bg); color: var(--state); border: 1px solid color-mix(in srgb, var(--state) 30%, transparent); white-space: nowrap; }
-.fl-chip svg { width: 18px; height: 18px; }
-.fl-chip em { font-style: normal; font-weight: 500; opacity: .85; }
-.fl-tag { display: block; width: fit-content; margin-top: 4px; font-size: 12px; font-weight: 600; color: var(--muted); }
+.fl-strip tbody th { font-size: 14px; font-weight: 600; color: #fff; }
+.fl-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; color: var(--state); white-space: nowrap; }
+.fl-chip em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 2px; }
+.fl-tag { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; color: var(--muted); }
 .fl-tag.flip { color: var(--no); }
 /* applicant panel */
 .fl-panel { padding: 18px !important; }
 .fl-panel .block, .fl-panel .form { background: transparent !important; border: 0 !important; box-shadow: none !important; }
-.fl-ptitle { font-size: 17px; font-weight: 700; color: #fff; }
-.fl-psub { font-size: 14px; color: var(--muted); margin: 2px 0 6px; line-height: 1.45; }
-#fl-maya { min-height: 46px; font-weight: 600; border-radius: 14px !important; transition: transform 100ms ease-out, background-color 150ms ease; }
-#fl-maya:active { transform: scale(0.97); }
-.fl-foot { font-size: 14px; color: var(--muted); line-height: 1.55; padding: 10px 6px 28px; }
-.fl-foot b { color: #fff; }
-footer { opacity: .6; }
+.fl-ptitle { font-size: 15px; font-weight: 600; color: #fff; }
+.fl-psub { font-size: 13px; color: var(--muted); margin: 3px 0 6px; line-height: 1.5; }
+#fl-maya { min-height: 44px; font-weight: 500; border-radius: 9px !important; box-shadow: none !important; border: 1px solid var(--line2) !important; background: transparent !important; }
+#fl-maya:hover { background: #171C24 !important; }
+#fl-maya:active { transform: scale(0.98); }
+.fl-foot { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 18px 2px 28px; border-top: 1px solid var(--line); margin-top: 18px; }
+.fl-foot b { color: var(--ink); font-weight: 600; }
+footer { opacity: .5; }
 @media (max-width: 760px) { .fl-cards { grid-template-columns: 1fr; } }
 @media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
-@media (prefers-reduced-transparency: reduce) {
-  .glass, #fl-nb .wrap { background: #121A2A !important; -webkit-backdrop-filter: none; backdrop-filter: none; } }
 """
 
 HEAD = (# The design is dark-only (liquid glass): force Gradio's dark theme so its own widgets match.
@@ -299,7 +285,7 @@ HEAD = (# The design is dark-only (liquid glass): force Gradio's dark theme so i
 with gr.Blocks(title="FairLens") as demo:
     gr.HTML("""<div class="fl-hero">
       <div class="fl-eyebrow">FairLens · trained on 264,340 real Georgia mortgage applications</div>
-      <h1>Same person. Different address.<br>Does the AI change its answer?</h1>
+      <h1>Same person, different address.<br>Does the AI change its answer?</h1>
       <p>Banks use AI to approve mortgages. These two AIs are <b>never told anyone's race</b>,
          but one of them is told the neighborhood. Watch what that does.</p></div>""")
     out_banner = gr.HTML()
@@ -330,12 +316,16 @@ with gr.Blocks(title="FairLens") as demo:
 
     fields = [income, loan_amount, property_value, dti, loan_type, thirty_year, coapplicant, preapproval, neighbourhood]
     outs = [out_banner, out_cards, out_strip]
+    # Speed: sliders update on release; every event drops stale calls and skips the loading overlay.
     for comp in fields:
-        comp.change(judge, fields, outs)
+        if comp is dti:
+            comp.release(judge, fields, outs, show_progress="hidden", trigger_mode="always_last")
+        else:
+            comp.change(judge, fields, outs, show_progress="hidden", trigger_mode="always_last")
     maya.click(lambda: [MAYA[k] for k in ("income", "loan_amount", "property_value", "dti", "loan_type",
                                           "thirty_year", "coapplicant", "preapproval")],
                None, fields[:-1])
-    demo.load(judge, fields, outs)
+    demo.load(judge, fields, outs, show_progress="hidden")
 
 if __name__ == "__main__":
     demo.launch(css=CSS, head=HEAD, theme=gr.themes.Base(primary_hue="sky", neutral_hue="slate", radius_size="lg"))
