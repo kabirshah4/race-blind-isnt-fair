@@ -40,6 +40,7 @@ def main():
     t["flag_C"] = risk(C, t) >= C["cutoff"]
     white_tract = t[t.tract_minority_population_percent < 20][TRACT_FEATURES].median()
 
+    t["risk_A"] = risk(A, t)
     rows = []
     qualified = t[t.approved == 1]
     for g in ["Black", "White"]:
@@ -52,9 +53,30 @@ def main():
                          "share of that group's qualified applicants": f"{len(subset) / (qualified.race_group == g).sum():.1%}",
                          "approved by A after moving ONLY the address": f"{flipped:.0%}"})
     table = pd.DataFrame(rows)
-    print(table.to_string(index=False))
+
+    # Two checks a fairness researcher would ask for:
+    # (1) Which part of the address matters? Swap ONLY "% minority residents" vs. ONLY the other 6.
+    # (2) Is 53% vs 22% just because flagged Black applicants sit closer to the cut-off?
+    #     Compare people at the SAME distance from it (risk between 1.0x and 1.5x the cut-off).
+    rows2 = []
+    for g in ["Black", "White"]:
+        flagged = qualified[(qualified.race_group == g) & qualified.flag_A]
+        for label, cols in [("only % minority residents", ["tract_minority_population_percent"]),
+                            ("only the other 6 neighbourhood numbers", [c for c in TRACT_FEATURES if c != "tract_minority_population_percent"])]:
+            moved = flagged.copy()
+            moved[cols] = white_tract[cols].values
+            rows2.append({"group": g, "swap": label, "people": len(flagged),
+                          "approved by A after the swap": f"{(risk(A, moved) < A['cutoff']).mean():.0%}"})
+        near = flagged[flagged.risk_A < 1.5 * A["cutoff"]]
+        moved = near.copy()
+        moved[TRACT_FEATURES] = white_tract.values
+        rows2.append({"group": g, "swap": "all 7, only people within 1.5x of the cut-off", "people": len(near),
+                      "approved by A after the swap": f"{(risk(A, moved) < A['cutoff']).mean():.0%}"})
+    table2 = pd.DataFrame(rows2)
+    print(table.to_string(index=False), "\n\n", table2.to_string(index=False))
     (ROOT / "results_counterfactual.md").write_text(
-        "## Same person, different address (2023 test data, model A)\n\n" + table.to_markdown(index=False) + "\n")
+        "## Same person, different address (2023 test data, model A)\n\n" + table.to_markdown(index=False) +
+        "\n\n## Which part of the address, and a like-for-like check\n\n" + table2.to_markdown(index=False) + "\n")
 
 
 if __name__ == "__main__":

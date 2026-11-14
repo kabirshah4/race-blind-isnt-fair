@@ -45,6 +45,11 @@ CATEGORICAL_FEATURES = ["loan_type", "conforming_loan_limit", "submission_of_app
 TRACT_FEATURES = [c for c in NUMERIC_FEATURES if c.startswith(("tract_", "ffiec_"))]
 PROTECTED = ["race_group", "sex_group", "age_group"]
 
+# ONE XGBoost setting used by every script (train, audit, fix), so every number in the
+# write-up comes from the same kind of model.
+XGB_PARAMS = dict(n_estimators=200, max_depth=5, learning_rate=0.08, subsample=0.8,
+                  colsample_bytree=0.8, n_jobs=-1, random_state=42)
+
 
 def parse_dti(v):
     if pd.isna(v):

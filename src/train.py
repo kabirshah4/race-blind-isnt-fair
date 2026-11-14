@@ -32,7 +32,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder, StandardScaler
 from xgboost import XGBClassifier
 
-from prep import CATEGORICAL_FEATURES, NUMERIC_FEATURES
+from prep import CATEGORICAL_FEATURES, NUMERIC_FEATURES, XGB_PARAMS
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "processed" / "hmda_ga.parquet"
@@ -57,9 +57,7 @@ def make_models():
         ]),
         "XGBoost": Pipeline([
             ("prep", make_preprocessor()),
-            ("model", XGBClassifier(n_estimators=400, max_depth=6, learning_rate=0.05,
-                                    subsample=0.8, colsample_bytree=0.8,
-                                    eval_metric="aucpr", n_jobs=-1, random_state=42)),
+            ("model", XGBClassifier(**XGB_PARAMS)),
         ]),
     }
 
@@ -94,11 +92,14 @@ def main():
     # Baseline 2: the classic lending rule.
     dti_rule = (test.dti > 43).astype(int).to_numpy()
     results.append(evaluate("Baseline: deny if DTI > 43%", y_test_denied, test.dti.to_numpy(), dti_rule))
-    # Baseline 3, a fairer comparison: the DTI rule flagging the SAME share of people as the
-    # models (~10%, the highest-DTI applicants), so precision/recall are compared like-for-like.
+    # Baseline 3: the strictest DTI rule. DTI is reported in bins, so the rule can't flag
+    # exactly 10%; "DTI > 55%" flags only the top bins (~3%). Below we compare the model
+    # at the SAME flag rate, so precision is compared like-for-like.
     dti_cut = np.quantile(train.dti, 1 - y_train_denied.mean())
     dti_matched = (test.dti > dti_cut).astype(int).to_numpy()
-    results.append(evaluate(f"Baseline: highest-DTI ~10% (DTI > {dti_cut:.0f}%)", y_test_denied, test.dti.to_numpy(), dti_matched))
+    strict_share_train = (train.dti > dti_cut).mean()
+    results.append(evaluate(f"Baseline: deny if DTI > {dti_cut:.0f}% (flags {100 * dti_matched.mean():.1f}%)",
+                            y_test_denied, test.dti.to_numpy(), dti_matched))
 
     # To compare fairly with the rule, each model flags the SAME share of 2023
     # applicants that we expect to be denied (the 2022 denial rate). We pick that
@@ -111,6 +112,9 @@ def main():
         score = pipe.predict_proba(X_test)[:, 1]
         results.append(evaluate(name, y_test_denied, score, (score >= cutoff).astype(int)))
         joblib.dump({"pipeline": pipe, "cutoff": cutoff}, MODELS / f"{name.split()[0].lower()}.joblib")
+        if name == "XGBoost":  # same model, flagging the same small share as the strict DTI rule
+            cut_s = np.quantile(pipe.predict_proba(X_train)[:, 1], 1 - strict_share_train)
+            results.append(evaluate(f"XGBoost at the strict rule's flag rate", y_test_denied, score, (score >= cut_s).astype(int)))
 
     table = pd.DataFrame(results)
     print(table.to_string(index=False))

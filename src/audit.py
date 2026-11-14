@@ -1,6 +1,6 @@
 """Fairness audit: does a model that never sees race still treat groups differently?
 
-Run:  .venv/bin/python src/audit.py      (after prep.py and train.py)
+Run:  .venv/bin/python src/audit.py      (after prep.py, train.py and fix.py)
 
 The four questions, in plain English
 ------------------------------------
@@ -24,7 +24,7 @@ import numpy as np
 import pandas as pd
 from sklearn.metrics import average_precision_score, roc_auc_score
 
-from prep import CATEGORICAL_FEATURES, NUMERIC_FEATURES, TRACT_FEATURES
+from prep import CATEGORICAL_FEATURES, NUMERIC_FEATURES, TRACT_FEATURES, XGB_PARAMS
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "processed" / "hmda_ga.parquet"
@@ -63,9 +63,7 @@ def fit_and_flag(train, test, numeric_features):
 
     prep = ColumnTransformer([("num", SimpleImputer(strategy="median"), numeric_features),
                               ("cat", OneHotEncoder(handle_unknown="ignore"), CATEGORICAL_FEATURES)])
-    pipe = Pipeline([("prep", prep), ("model", XGBClassifier(
-        n_estimators=400, max_depth=6, learning_rate=0.05, subsample=0.8,
-        colsample_bytree=0.8, n_jobs=-1, random_state=42))])
+    pipe = Pipeline([("prep", prep), ("model", XGBClassifier(**XGB_PARAMS))])
     cols = numeric_features + CATEGORICAL_FEATURES
     y = 1 - train.approved
     pipe.fit(train[cols], y)
@@ -81,9 +79,10 @@ def main():
     report = []
 
     # ---- Q1 + Q2: the full model (includes neighbourhood features) ----------
-    saved = joblib.load(ROOT / "models" / "xgboost.joblib")
-    cols = NUMERIC_FEATURES + CATEGORICAL_FEATURES
-    score_full = saved["pipeline"].predict_proba(test[cols])[:, 1]
+    # The exact model A behind the write-up's headline numbers (saved by fix.py).
+    saved = joblib.load(ROOT / "models" / "model_A_full.joblib")
+    X = saved["prep"].transform(test[saved["features"] + CATEGORICAL_FEATURES])
+    score_full = saved["models"][0].predict_proba(X)[:, 1]
     flags_full = (score_full >= saved["cutoff"]).astype(int)
     full = group_table(test, flags_full)
     print("Q1+Q2  Full model (race never used):\n", full.to_string(), "\n")

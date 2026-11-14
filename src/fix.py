@@ -34,7 +34,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import OneHotEncoder
 from xgboost import XGBClassifier
 
-from prep import CATEGORICAL_FEATURES, NUMERIC_FEATURES, TRACT_FEATURES
+from prep import CATEGORICAL_FEATURES, NUMERIC_FEATURES, TRACT_FEATURES, XGB_PARAMS
 
 ROOT = Path(__file__).resolve().parents[1]
 DATA = ROOT / "data" / "processed" / "hmda_ga.parquet"
@@ -43,8 +43,7 @@ rng = np.random.default_rng(42)
 
 
 def xgb():
-    return XGBClassifier(n_estimators=200, max_depth=5, learning_rate=0.08, subsample=0.8,
-                         colsample_bytree=0.8, n_jobs=-1, random_state=42)
+    return XGBClassifier(**XGB_PARAMS)
 
 
 def to_matrix(train, test, numeric_features):

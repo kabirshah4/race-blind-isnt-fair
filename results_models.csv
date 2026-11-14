@@ -1,6 +1,7 @@
 method,flagged %,precision,recall,PR-AUC,ROC-AUC
 Baseline: approve everyone,0.0,0.0,0.0,0.098,0.5
 Baseline: deny if DTI > 43%,44.0,0.149,0.669,0.342,0.698
-Baseline: highest-DTI ~10% (DTI > 55%),2.7,0.857,0.24,0.342,0.698
+Baseline: deny if DTI > 55% (flags 2.7%),2.7,0.857,0.24,0.342,0.698
 Logistic regression,11.7,0.322,0.383,0.338,0.726
-XGBoost,10.3,0.441,0.463,0.514,0.782
+XGBoost,10.3,0.444,0.466,0.516,0.784
+XGBoost at the strict rule's flag rate,2.6,0.943,0.248,0.516,0.784

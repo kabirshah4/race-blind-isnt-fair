@@ -1,4 +1,4 @@
-# Race-Blind Isn't Fair: Auditing a Mortgage-Approval Model for Hidden Redlining
+# Race-Blind Isn't Fair: Auditing a Mortgage Model for Neighbourhood Proxies
 
 **Track:** AI + Finance
 **Team:** Kabir Shah, Vishnu Veer
@@ -24,9 +24,9 @@ Real, current data with a **train-on-2022, test-on-2023** split; **three data le
 
 **Leakage.** We compared each column for approved vs. denied files. (1) Interest rate, loan costs and denial reasons only exist after a decision, so we dropped them, and we recalculated loan-to-value because the reported one was missing far more often for denials. (2) Missing addresses were 5× more common among denials, so we removed those 0.15% of rows. (3) An independent review found two more: `preapproval` (denied pre-approval requests are filed under a code we never download, so "asked for pre-approval" meant 0% denied) and `initially_payable_to_institution` (code 3 meant 83% denied). We removed both and re-ran everything. **All numbers below are after all three fixes.**
 
-**Model.** XGBoost on 17 inputs (income, loan, home value, loan-to-value, debt-to-income, loan term and type, co-applicant, plus 7 census-tract statistics). Denials are rare, so we use PR-AUC, precision and recall. Every model flags the same share of applicants (the 2022 denial rate), with the cut-off set on 2022 data.
+**Model.** XGBoost (one fixed setting used everywhere) on 17 inputs (income, loan, home value, loan-to-value, debt-to-income, loan term and type, co-applicant, plus 7 census-tract statistics). Denials are rare, so we use PR-AUC, precision and recall. Every model flags the same share of applicants (the 2022 denial rate), with the cut-off set on 2022 data.
 
-**Fairness.** For each group, the **false-alarm rate**: the share of applicants the *bank approved* that the model flags as "likely denied." We compare Black with white applicants as a ratio, with 95% bootstrap intervals over the 2023 test set. Fix C uses fairlearn's Exponentiated Gradient: race is used **only during training**. To make one decision we average its sub-models' scores and apply a cut-off, so its fairness is measured on held-out data rather than guaranteed.
+**Fairness.** For each group, the **false-alarm rate**: the share of applicants the *bank approved* that the model flags as "likely denied." We compare Black with white applicants as a ratio, with 95% bootstrap intervals over the 2023 test set. Fix C uses fairlearn's Exponentiated Gradient: race is used **only during training**. It was trained on a 60,000-row sample of 2022 (it is slow), so some of its small PR-AUC drop may come from less data. To make one decision we average its sub-models' scores and apply a cut-off, so its fairness is measured on held-out data rather than guaranteed.
 
 ## Results (2023 test data, 117,547 applications)
 
@@ -38,14 +38,15 @@ Real, current data with a **train-on-2022, test-on-2023** split; **three data le
 | B. Drop all 7 neighbourhood inputs | 0.511 | 1.88× (1.79–1.98) |
 | C. B + fairness constraint | 0.501 | **1.21×** (1.14–1.27) |
 
-- **The model beats the rule:** PR-AUC 0.516 vs. 0.342 (1.5×).
+- **The model beats the rule:** PR-AUC 0.516 vs. 0.342 (1.5×). At the strictest rule's flag rate (DTI > 55%, 2.7% of applicants), the model's flags are right 94% of the time vs. 86% for the rule.
 - **Race-blind, yet unfair:** model A wrongly flags **12.0%** of qualified Black applicants vs. **4.0%** of qualified white applicants.
-- **Neighbourhood is the proxy:** the detective guesses Black vs. white from model A's inputs with ROC-AUC 0.88 (0.5 = coin flip); the neighbourhood inputs alone reach 0.845. Removing only "% minority" leaves 2.32×, so the proxy is spread across several neighbourhood inputs.
-- **Same person, different address:** for the 2,718 qualified Black applicants model A wrongly flags, changing **only their neighbourhood** to a typical mostly-white one makes A approve **53%** of them (22% for wrongly flagged white applicants).
+- **Neighbourhood is a major proxy, not the only one:** the detective guesses Black vs. white from model A's inputs with ROC-AUC 0.88 (0.5 = coin flip); neighbourhood inputs alone reach 0.845, applicant finances alone 0.765. Removing all neighbourhood inputs removes about **56% of the excess gap** (3.01× → 1.88×); the rest flows through loan-to-value, debt-to-income and loan type.
+- **Same person, different address:** for the 2,718 qualified Black applicants model A wrongly flags, changing **only their neighbourhood** to a typical mostly-white one makes A approve **53%** of them (22% for wrongly flagged white applicants). Changing **only "% minority residents"** flips 49% (16% for white applicants), so the model leans directly on a neighbourhood's racial makeup. Comparing only people near the cut-off, the gap holds: 70% vs. 37%.
+- **A less discriminatory alternative:** dropping neighbourhood inputs (B) costs almost nothing (PR-AUC 0.516 → 0.511) and needs no race data at all.
 - **The fix and its cost:** C cuts the gap from 3.01× to 1.21× while keeping 97% of A's PR-AUC. Black false alarms fall from 12.0% to 6.8%, but white false alarms rise from 4.0% to 5.6%, and Black recall falls from 52% to 47%.
-- **Surprise:** on 2022 validation data, fairlearn's default *difference* rule ("false-alarm rates within 1 point") still left a 1.74× gap, because the rates are small. A *ratio* rule left 1.31×, so we chose it. **How you measure fairness decides whether you find unfairness.**
+- **What we noticed:** on 2022 validation data, fairlearn's default *difference* rule ("false-alarm rates within 1 point") still left a 1.74× gap at our cut-off, while a *ratio* rule left 1.31×, so we chose the ratio rule. Part of this may be because fairlearn enforces its rule at a different decision threshold than ours, so we treat it as an observation, not a proof: small rates can hide large relative gaps.
 
-**Limitations.** HMDA has no credit scores, so some gaps may reflect information we can't see. Our labels are past bank decisions, so "qualified" means "the bank approved them," and the model learns the banks' patterns; we measure **disparities, not intent**. Equalising false alarms changes precision by group (56% vs. 31%), a known trade-off between fairness definitions. Using race in training is legally debated in US lending; fix B needs no race at all. One state, two years.
+**Limitations.** HMDA has no credit scores, so some gaps may reflect information we can't see. Our labels are past bank decisions, so "qualified" means "the bank approved them," and the model learns the banks' patterns; we measure **disparities, not intent**. Equalising false alarms changes precision by group (56% vs. 31%), a known trade-off between fairness definitions. Using race in training is legally debated in US lending; fix B needs no race at all. Our confidence intervals only resample the test set (not training randomness or lender clustering), so they are somewhat too narrow. The demo's example applicant is constructed (one of 174 cases we found where the address alone flips model A). One state, two years.
 
 ## What we'd do next
 
