@@ -1,0 +1,5 @@
+method,flagged %,precision,recall,PR-AUC,ROC-AUC
+Baseline: approve everyone,0.0,0.0,0.0,0.098,0.5
+Baseline: deny if DTI > 43%,44.0,0.149,0.669,0.342,0.698
+Logistic regression,11.4,0.427,0.494,0.485,0.789
+XGBoost,10.0,0.545,0.556,0.616,0.832

@@ -1,0 +1,14 @@
+.venv/
+.venv-tts/
+data/raw/
+data/processed/
+__pycache__/
+.ipynb_checkpoints/
+.DS_Store
+.impeccable/
+video/
+video-long/
+*.mp4
+checklist.html
+Hackathon-Checklist.pdf
+notebooks/
