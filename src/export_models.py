@@ -107,6 +107,26 @@ def main():
         print(f"model {key}: max difference {np.abs(py - js).max():.2e}, decisions that differ: {flips} of {n}")
     assert worst < 1e-4, "export doesn't match the Python models"
 
+    # Random REAL applicants for the page's "random real applicant" button, so nobody has to
+    # trust our hand-picked example. Drawn at random (fixed seed) from all 117,547 Georgia 2023
+    # test applications. Only the finance inputs + the bank's real decision; no race, no address.
+    from prep import load_year
+    test = load_year(2023)
+    pick = test.sample(500, random_state=7)
+    type_name = {"1": "Conventional", "2": "FHA (government-backed)", "3": "VA (veterans)", "4": "USDA (rural)"}
+    out["samples"] = [[round(r.income), round(r.loan_amount), round(r.property_value), int(r.dti), int(r.loan_term_360),
+                       int(r.has_coapplicant), type_name[str(r.loan_type)], int(r.approved)] for r in pick.itertuples()]
+
+    # The same check the page shows: for how many of them does model A change its answer
+    # when only the neighbourhood changes? (Model C never sees the neighbourhood, so 0 by design.)
+    rows = pd.DataFrame([{"income": s[0], "loan_amount": s[1], "property_value": s[2], "ltv": s[1] / s[2] * 100,
+                          "dti": s[3], "loan_term_360": s[4], "has_coapplicant": s[5], "loan_type": {v: k for k, v in type_name.items()}[s[6]],
+                          "conforming_loan_limit": "C" if s[1] <= 766 else "NC", "submission_of_application": "1"} for s in out["samples"]])
+    A = joblib.load(ROOT / "models" / "model_A_full.joblib")
+    deny = {nb: [js_style_risk(out["A"], {**r, **prof}) >= A["cutoff"] for r in rows.to_dict("records")] for nb, prof in nbs.items()}
+    flips = sum(len({deny[nb][i] for nb in nbs}) > 1 for i in range(len(rows)))
+    print(f"random real applicants: typical AI changes its answer with the address for {flips} of {len(rows)} ({flips / len(rows):.0%})")
+
     path = ROOT / "docs" / "models.json"
     path.write_text(json.dumps(out, separators=(",", ":")))
     print(f"-> {path.relative_to(ROOT)} ({path.stat().st_size / 1e6:.1f} MB)")

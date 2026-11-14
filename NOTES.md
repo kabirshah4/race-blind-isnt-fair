@@ -369,4 +369,7 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   the page walks the same trees in JavaScript. Any number you type gets a live answer.
   Checked: on 2,000 random applicants, 0 decisions differ from Python. Also on Cloudflare:
   https://race-blind-isnt-fair.pages.dev
+- **Random real applicant button** (the blind judge's top suggestion, to answer "you cherry-picked the example"):
+  500 real 2023 Georgia applications drawn at random. For **55 of 500 (11%)**, the typical AI changes its answer
+  just because of the address; the fixed AI never does (it can't see the address).
 - README opens with a 10-second summary; write-up ~860 words.

@@ -149,8 +149,13 @@ input[type=range] { width: 100%; accent-color: var(--navy); min-height: 32px; }
 
     <aside class="panel form" aria-label="The applicant">
       <div><div class="ptitle">The applicant</div>
-        <div class="psub">Filled in with a constructed borderline example (not a real person). Type anything: both real AIs run live in your browser.</div></div>
-      <button class="reset" id="reset">Reset to the example applicant</button>
+        <div class="psub">Type anything: both real AIs run live in your browser.</div></div>
+      <div class="row2">
+        <button class="reset" id="reset">Example</button>
+        <button class="reset" id="random">Random real</button>
+      </div>
+      <div class="psub" id="who"></div>
+      <div class="psub" id="randstat"></div>
       <label>Yearly income ($ thousands)<input type="number" id="income" min="1" step="1" inputmode="numeric"></label>
       <div class="row2">
         <label>Loan ($K)<input type="number" id="loan" min="1" step="1" inputmode="numeric"></label>
@@ -271,7 +276,7 @@ function render() {
       ? ` At a <b>${state.nb.toLowerCase()}</b> address, the typical AI says <span class="tno">deny</span> and our fixed AI says <span class="tok">approve</span>.` : "";
     msg = `<b>The typical bank AI changes its answer just because of the address.</b> Our fixed AI gives this person the same answer everywhere.${here}`;
   } else {
-    msg = `For this applicant, neither AI changes its answer with the address. Press <b>Reset to the example applicant</b> to see a case where it does.`;
+    msg = `For this applicant, neither AI changes its answer with the address. That's true for most people, but not all: press <b>Random real</b> a few times, or <b>Example</b>.`;
   }
   $("banner").className = ""; $("banner").innerHTML = msg;
 }
@@ -294,7 +299,26 @@ async function start() {
   $("dti").oninput = (e) => { state.dti = +e.target.value; render(); };
   $("thirty").onchange = (e) => { state.thirty = e.target.checked ? 1 : 0; render(); };
   $("co").onchange = (e) => { state.co = e.target.checked ? 1 : 0; render(); };
-  $("reset").onclick = () => { state = { ...EXAMPLE, nb: state.nb }; fillForm(); render(); };
+  const WHO_EXAMPLE = "Showing a constructed borderline example (not a real person).";
+  const edited = () => { $("who").textContent = "Showing your edited applicant."; };
+  for (const id of ["income", "loan", "price", "dti", "lt", "thirty", "co"]) $(id).addEventListener("input", edited);
+  $("reset").onclick = () => { state = { ...EXAMPLE, nb: state.nb }; $("who").textContent = WHO_EXAMPLE; fillForm(); render(); };
+  // Random REAL applicants: 500 drawn at random from all 117,547 Georgia 2023 applications (src/export_models.py).
+  // Only their finances are shown; the neighborhood is still whatever you pick above.
+  const S = M.samples;
+  $("random").onclick = () => {
+    const k = Math.floor(Math.random() * S.length), [income, loan, price, dti, thirty, co, lt, approved] = S[k];
+    state = { income, loan, price, dti: Math.min(65, Math.max(10, dti)), thirty, co, lt, nb: state.nb };
+    $("who").innerHTML = `Showing real 2023 Georgia application <b>#${k + 1} of ${S.length}</b>, picked at random. The bank actually <b>${approved ? "approved" : "denied"}</b> it.`;
+    fillForm(); render();
+  };
+  // Not cherry-picked: across all 500 random real applicants, how often does the typical AI change its answer with the address?
+  const flips = S.filter(([income, loan, price, dti, thirty, co, lt]) => {
+    const s = { income, loan, price, dti, thirty, co, lt };
+    return new Set(Object.keys(NBS).map((nb) => denied("A", s, nb))).size > 1;
+  }).length;
+  $("randstat").innerHTML = `Across ${S.length} random real applicants, the typical AI changes its answer just because of the address for <b>${flips} (${Math.round(flips / S.length * 100)}%)</b>. Our fixed AI: 0, since it never sees the address.`;
+  $("who").textContent = WHO_EXAMPLE;
   fillForm(); render();
 }
 start();
