@@ -176,108 +176,158 @@ def judge(income, loan_amount, property_value, dti, loan_type, thirty_year, coap
 
 
 CSS = """
-/* Quiet dark. No blur, no glows: flat surfaces, hairline borders, small status dots.
-   Everything here is cheap to paint, so scrolling and updates stay smooth. */
+/* Sky: a navy sky that fades into white. Navy is the only colour on actions; serif for big moments. */
 :root, .dark {
-  --bg:#0B0E13; --surface:#11151C; --ink:#E8EDF3; --muted:#8B97A8; --line:#1F2630; --line2:#2A323E;
-  --ok:#55C28E; --no:#EC7A6F; --accent:#8AB4F8; --focus:#8AB4F8;
-  --body-background-fill:var(--bg); --background-fill-primary:var(--surface); --background-fill-secondary:var(--surface);
+  --serif: "New York", ui-serif, "Iowan Old Style", Georgia, serif;
+  --sans: -apple-system, BlinkMacSystemFont, "SF Pro Text", "Helvetica Neue", sans-serif;
+  --bg:#FBFBFD; --surface:#FFFFFF; --ink:#0B1A33; --muted:#5A6780; --line:#E3E7EF; --line2:#D5DBE6;
+  --navy:#0B2A5B; --ok:#127A5B; --no:#B4233C; --focus:#2C5AA0;
+  --shadow: 0 1px 2px rgba(11,26,51,.04), 0 12px 32px -12px rgba(11,26,51,.12);
+  --body-background-fill:var(--bg); --background-fill-primary:var(--surface); --background-fill-secondary:#F5F7FB;
   --block-background-fill:transparent; --block-border-color:transparent; --block-border-width:0px; --block-label-text-color:var(--muted);
-  --block-title-text-color:var(--muted); --body-text-color:var(--ink); --body-text-color-subdued:var(--muted);
-  --input-background-fill:#0E1218; --input-border-color:var(--line2); --input-border-color-focus:var(--focus); --input-shadow:none;
-  --border-color-primary:var(--line); --checkbox-background-color:#0E1218; --checkbox-border-color:#3A4452;
-  --checkbox-background-color-selected:var(--accent); --slider-color:var(--accent); --neutral-200:var(--line2);
-  --button-secondary-background-fill:transparent; --button-secondary-background-fill-hover:#171C24;
-  --button-secondary-text-color:var(--ink); --button-secondary-border-color:var(--line2); --shadow-drop:none; --shadow-drop-lg:none;
+  --block-title-text-color:var(--muted); --block-label-background-fill:transparent; --body-text-color:var(--ink); --body-text-color-subdued:var(--muted);
+  --input-background-fill:#F5F7FB; --input-background-fill-focus:#FFFFFF; --input-border-color:var(--line); --input-border-color-focus:var(--focus); --input-shadow:none;
+  --input-radius:12px; --border-color-primary:var(--line); --checkbox-background-color:#FFFFFF; --checkbox-border-color:#B9C2D3;
+  --checkbox-background-color-selected:var(--navy); --checkbox-border-color-selected:var(--navy); --slider-color:var(--navy); --neutral-200:var(--line2);
+  --button-secondary-background-fill:transparent; --button-secondary-background-fill-hover:#F5F7FB;
+  --button-secondary-text-color:var(--ink); --button-secondary-border-color:var(--line); --shadow-drop:none; --shadow-drop-lg:none;
+  color-scheme: light;
 }
 body, gradio-app, .gradio-container { background: var(--bg) !important; }
-.gradio-container { max-width: 1180px !important; margin: 0 auto !important; font-family: "IBM Plex Sans", system-ui, sans-serif !important;
-  color: var(--ink); -webkit-font-smoothing: antialiased; }
-.glass { background: var(--surface) !important; border: 1px solid var(--line) !important; border-radius: 12px !important; box-shadow: none !important; }
-.fl-hero { padding: 34px 2px 4px; }
-.fl-eyebrow { font-size: 13px; font-weight: 500; color: var(--muted); }
-.fl-hero h1 { font-size: clamp(28px, 3.4vw, 40px); line-height: 1.12; letter-spacing: -0.02em; font-weight: 600; margin: 10px 0 10px; color: #fff; }
-.fl-hero p { font-size: 17px; line-height: 1.55; color: var(--muted); max-width: 720px; margin: 0; font-weight: 400; }
-.fl-hero p b { color: var(--ink); font-weight: 500; }
-.fl-banner { padding: 14px 2px 6px; border-top: 1px solid var(--line); margin-top: 18px; }
-.fl-banner .fl-bk { font-size: 12px; font-weight: 500; color: var(--muted); letter-spacing: .02em; }
-.fl-banner p { margin: 4px 0 0; font-size: 16px; line-height: 1.55; color: var(--ink); font-weight: 400; max-width: 900px; }
-.fl-banner b { font-weight: 600; color: #fff; }
+.gradio-container { max-width: 1120px !important; margin: 0 auto !important; font-family: var(--sans) !important;
+  color: var(--ink); -webkit-font-smoothing: antialiased; padding-top: 0 !important; width: 100% !important; min-width: 0 !important; }
+gradio-app .main, gradio-app .wrap, gradio-app main.contain { min-width: 0 !important; max-width: 100% !important; }
+@media (max-width: 760px) { gradio-app .main { padding-left: 14px !important; padding-right: 14px !important; } }
+body { overflow-x: hidden; }
+.glass { background: var(--surface) !important; border: 0 !important; border-radius: 20px !important; box-shadow: var(--shadow) !important; }
+
+/* hero: full-bleed sky with drifting light, grain, and a live card that flips */
+.fl-hero { position: relative; margin: 12px 0 0; border-radius: 28px; padding: 96px 24px 112px; text-align: center; color: #FBFBFD; overflow: hidden;
+  background: linear-gradient(180deg,#0A1F45 0%,#123668 30%,#3E6AA8 58%,#A9C1E3 82%,#FBFBFD 100%); }
+.fl-haze { position: absolute; inset: -20%; pointer-events: none;
+  background: radial-gradient(40% 30% at 20% 30%,rgba(169,193,227,.35),transparent 70%),radial-gradient(35% 25% at 80% 20%,rgba(255,255,255,.18),transparent 70%),radial-gradient(50% 30% at 60% 70%,rgba(120,160,215,.30),transparent 70%);
+  animation: fl-drift 28s ease-in-out infinite alternate; }
+@keyframes fl-drift { to { transform: translate3d(4%,3%,0) scale(1.08); } }
+.fl-grain { position: absolute; inset: 0; pointer-events: none; opacity: .07; mix-blend-mode: overlay;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='160' height='160'%3E%3Cfilter id='n'%3E%3CfeTurbulence baseFrequency='.9' numOctaves='2'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E"); }
+.fl-hero > *:not(.fl-haze):not(.fl-grain) { position: relative; z-index: 1; }
+.fl-brand { font: 600 15px var(--sans); color: rgba(251,251,253,.85) !important; margin-bottom: 48px; }
+.fl-hero h1 { font-family: var(--serif); font-weight: 400; font-size: clamp(44px,6.5vw,84px); line-height: 1.04; letter-spacing: -0.02em;
+  margin: 0 auto; max-width: 900px; color: #FBFBFD; text-wrap: balance; }
+.fl-hero p.fl-lede { margin: 24px auto 0; font-size: 19px; line-height: 1.55; max-width: 600px; color: rgba(251,251,253,.86); }
+.fl-rise { opacity: 0; transform: translateY(18px); filter: blur(6px); animation: fl-rise 1s cubic-bezier(.2,.8,.2,1) forwards; }
+.fl-d1 { animation-delay: .12s; } .fl-d2 { animation-delay: .24s; } .fl-d3 { animation-delay: .4s; }
+@keyframes fl-rise { to { opacity: 1; transform: none; filter: none; } }
+.fl-live { max-width: 560px; margin: 52px auto 0; padding: 22px 24px; border-radius: 24px; background: #FBFBFD; color: var(--ink); text-align: left;
+  box-shadow: 0 1px 2px rgba(11,26,51,.06), 0 40px 80px -30px rgba(5,15,40,.55); }
+.fl-who { display: flex; justify-content: space-between; gap: 12px; font-size: 13px; color: var(--muted); }
+.fl-addr { margin: 14px 0 18px; font-family: var(--serif); font-size: 26px; line-height: 1.15; }
+.fl-addr span { display: inline-block; transition: opacity .35s, transform .35s, filter .35s; }
+.fl-addr span.out { opacity: 0; transform: translateY(-8px); filter: blur(4px); }
+.fl-r { display: flex; justify-content: space-between; align-items: center; padding-top: 10px; margin-top: 10px; border-top: 1px solid var(--line); font-size: 15px; }
+.fl-v { display: inline-flex; align-items: center; gap: 8px; font-weight: 600; }
+.fl-v i { width: 8px; height: 8px; border-radius: 50%; background: currentColor; }
+.fl-v.ok { color: var(--ok); } .fl-v.no { color: var(--no); }
+.fl-r.flash { animation: fl-flash .9s ease; } @keyframes fl-flash { 30% { background: rgba(180,35,60,.07); } }
+.fl-live small { display: block; margin-top: 14px; font-size: 12px; color: var(--muted); }
+.fl-stats { display: grid; grid-template-columns: repeat(3,1fr); gap: 32px; text-align: center; margin: 8px 0 0; }
+.fl-stats strong { display: block; font-family: var(--serif); font-weight: 400; font-size: clamp(40px,5vw,60px); line-height: 1; letter-spacing: -0.02em; color: var(--ink); }
+.fl-stats span { display: block; margin: 10px auto 0; font-size: 14px; color: var(--muted); max-width: 240px; }
+
+.fl-banner { margin: 40px 0 4px; padding: 20px 2px; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); }
+.fl-banner .fl-bk { display: none; }
+.fl-banner p { margin: 0; font-size: 18px; line-height: 1.55; color: var(--ink); max-width: 820px; }
+.fl-banner b { font-weight: 600; }
 .fl-banner .ok { color: var(--ok); font-weight: 600; } .fl-banner .no { color: var(--no); font-weight: 600; }
-.fl-step { display: flex; align-items: baseline; gap: 8px; font-size: 14px; font-weight: 500; color: var(--ink); margin: 14px 0 8px; }
-.fl-step span { color: var(--muted); font-variant-numeric: tabular-nums; }
-.fl-step span::after { content: "."; }
-/* neighbourhood switch: a thin segmented control */
-#fl-nb .wrap { display: grid !important; grid-template-columns: repeat(3, 1fr); gap: 2px; padding: 3px; border-radius: 10px;
-  background: var(--surface); border: 1px solid var(--line); }
-#fl-nb label { justify-content: center; border: 0 !important; border-radius: 7px !important; padding: 10px 8px !important; min-height: 44px;
+.fl-step { display: flex; align-items: baseline; gap: 12px; font-size: 15px; font-weight: 500; color: var(--ink); margin: 32px 0 14px; }
+.fl-step span { font-family: var(--serif); font-size: 20px; color: var(--muted); }
+
+#fl-nb .wrap { display: grid !important; grid-template-columns: repeat(3,1fr); gap: 4px; padding: 4px; border-radius: 999px; background: #EEF1F7; border: 0; }
+#fl-nb label { justify-content: center; border: 0 !important; border-radius: 999px !important; padding: 10px 8px !important; min-height: 44px;
   font-size: 15px; font-weight: 500; color: var(--muted) !important; background: transparent !important; cursor: pointer; box-shadow: none !important;
-  transition: background-color 120ms ease, color 120ms ease; }
+  transition: background-color .2s ease, color .2s ease; }
 #fl-nb label:hover { color: var(--ink) !important; }
-#fl-nb label:active { transform: scale(0.98); }
-#fl-nb label.selected { color: #fff !important; background: #1E2530 !important; }
+#fl-nb label:active { transform: scale(0.97); }
+#fl-nb label.selected { color: #FBFBFD !important; background: var(--navy) !important; }
 #fl-nb input { position: absolute; opacity: 0; }
-#fl-nb label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 2px; }
-/* the two decisions */
-.fl-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
-.fl-card { padding: 18px 20px !important; }
+#fl-nb label:has(input:focus-visible) { outline: 2px solid var(--focus); outline-offset: 3px; }
+
+.fl-cards { display: grid; grid-template-columns: 1fr 1fr; gap: 20px; }
+.fl-card { padding: 24px !important; }
 .fl-ok { --state: var(--ok); } .fl-no { --state: var(--no); }
-.fl-ct { font-size: 16px; font-weight: 600; color: #fff; }
+.fl-ct { font-size: 16px; font-weight: 600; color: var(--ink); }
 .fl-cs { font-size: 13px; color: var(--muted); margin-top: 2px; }
-.fl-verdict { display: flex; align-items: center; gap: 9px; margin: 18px 0 14px; font-size: 22px; font-weight: 600; color: var(--state); letter-spacing: -0.01em; }
-.fl-verdict i, .fl-chip i { display: inline-block; width: 8px; height: 8px; border-radius: 50%; background: var(--state); flex: none; }
+.fl-verdict { display: flex; align-items: center; gap: 10px; margin: 22px 0 6px; font-family: var(--serif); font-size: 34px; line-height: 1.1; color: var(--state); }
+.fl-verdict i, .fl-chip i { display: inline-block; width: 9px; height: 9px; border-radius: 50%; background: var(--state); flex: none; }
 .fl-mk { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; }
 .fl-mk b { color: var(--ink); font-weight: 600; }
-.fl-meter { position: relative; height: 4px; background: var(--line2); border-radius: 2px; margin: 10px 0 6px; }
-.fl-fill { position: absolute; inset: 0 auto 0 0; background: var(--state); border-radius: 2px; }
-.fl-tick { position: absolute; top: -5px; bottom: -5px; width: 1.5px; background: var(--ink); }
-.fl-scale { position: relative; height: 16px; font-size: 12px; color: var(--muted); }
+.fl-meter { position: relative; height: 6px; background: #E8ECF3; border-radius: 9px; margin: 14px 0 6px; }
+.fl-fill { position: absolute; inset: 0 auto 0 0; background: var(--state); border-radius: 9px; }
+.fl-tick { position: absolute; top: -5px; height: 16px; width: 2px; border-radius: 2px; background: var(--ink); }
+.fl-scale { position: relative; height: 18px; font-size: 12px; color: var(--muted); }
 .fl-tlab { position: absolute; transform: translateX(-50%); white-space: nowrap; }
-.fl-fix { margin-top: 12px; padding-top: 12px; border-top: 1px solid var(--line); }
-.fl-fixk { display: block; font-size: 12px; font-weight: 500; color: var(--muted); }
+.fl-fix { margin-top: 18px; padding-top: 14px; border-top: 1px solid var(--line); }
+.fl-fixk { display: block; font-size: 13px; color: var(--muted); }
 .fl-fixv { display: block; font-size: 15px; line-height: 1.45; color: var(--ink); margin-top: 2px; }
-.fl-fixv b { color: #fff; font-weight: 600; }
-/* every address at once */
-.fl-strip { padding: 4px 18px 8px !important; margin-top: 12px; }
+.fl-fixv b { font-weight: 600; }
+
+.fl-strip { padding: 0 !important; margin-top: 8px; background: transparent !important; box-shadow: none !important; }
 .fl-scroll { overflow-x: auto; }
-.fl-strip table { width: 100%; border-collapse: collapse; border: 0 !important; font-variant-numeric: tabular-nums; table-layout: fixed; background: transparent !important; }
+.fl-strip table { width: 100%; border-collapse: collapse; border: 0 !important; font-variant-numeric: tabular-nums; background: transparent !important; }
 .fl-strip thead, .fl-strip tbody, .fl-strip tr { border: 0 !important; background: transparent !important; }
-.fl-strip th, .fl-strip td { text-align: left; padding: 11px 6px !important; border: 0 !important; border-top: 1px solid var(--line) !important;
-  vertical-align: middle; background: transparent !important; color: var(--ink); }
-.fl-strip thead th { border-top: 0 !important; font-size: 13px; font-weight: 500; }
+.fl-strip th, .fl-strip td { text-align: left; padding: 14px 10px !important; border: 0 !important; border-bottom: 1px solid var(--line) !important;
+  vertical-align: top; background: transparent !important; color: var(--ink); }
+.fl-strip thead th { font-size: 14px; font-weight: 500; color: var(--muted); }
 .fl-strip thead small { display: block; font-weight: 400; color: var(--muted); font-size: 12px; }
-.fl-strip th:first-child { width: 30%; }
-.fl-strip tbody th { font-size: 14px; font-weight: 600; color: #fff; }
-.fl-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; font-weight: 500; color: var(--state); white-space: nowrap; }
-.fl-chip em { font-style: normal; color: var(--muted); font-weight: 400; margin-left: 2px; }
+.fl-strip tbody th { font-size: 14px; font-weight: 600; min-width: 150px; }
+.fl-chip { display: inline-flex; align-items: center; gap: 7px; font-size: 14px; white-space: nowrap; }
+.fl-chip em { font-style: normal; color: var(--muted); margin-left: 4px; }
 .fl-tag { display: block; margin-top: 3px; font-size: 12px; font-weight: 400; color: var(--muted); }
 .fl-tag.flip { color: var(--no); }
-/* applicant panel */
-.fl-panel { padding: 18px !important; }
+
+.fl-panel { padding: 26px !important; margin-top: 36px; gap: 14px !important; }
 .fl-panel .block, .fl-panel .form { background: transparent !important; border: 0 !important; box-shadow: none !important; }
-.fl-ptitle { font-size: 15px; font-weight: 600; color: #fff; }
-.fl-psub { font-size: 13px; color: var(--muted); margin: 3px 0 6px; line-height: 1.5; }
-#fl-maya { min-height: 44px; font-weight: 500; border-radius: 9px !important; box-shadow: none !important; border: 1px solid var(--line2) !important; background: transparent !important; }
-#fl-maya:hover { background: #171C24 !important; }
+.fl-panel input[type=number] { font-size: 16px !important; font-weight: 500; }
+.fl-ptitle { font-family: var(--serif); font-size: 24px; color: var(--ink); }
+.fl-psub { font-size: 13px; color: var(--muted); margin: 6px 0 4px; line-height: 1.5; }
+#fl-maya { min-height: 44px; font-weight: 500; border-radius: 999px !important; box-shadow: none !important; border: 1px solid var(--line) !important; background: transparent !important; color: var(--ink) !important; }
+#fl-maya:hover { border-color: var(--ink) !important; }
 #fl-maya:active { transform: scale(0.98); }
-.fl-foot { font-size: 13px; color: var(--muted); line-height: 1.6; padding: 18px 2px 28px; border-top: 1px solid var(--line); margin-top: 18px; }
+.fl-foot { font-size: 14px; color: var(--muted); line-height: 1.6; padding: 24px 2px 32px; border-top: 1px solid var(--line); margin-top: 48px; max-width: 820px; }
 .fl-foot b { color: var(--ink); font-weight: 600; }
 footer { opacity: .5; }
-@media (max-width: 760px) { .fl-cards { grid-template-columns: 1fr; } }
-@media (prefers-reduced-motion: reduce) { * { transition: none !important; } }
+@media (max-width: 760px) { .fl-cards, .fl-stats { grid-template-columns: 1fr; } }
+@media (prefers-reduced-motion: reduce) { * { transition: none !important; animation: none !important; } .fl-rise { opacity: 1; transform: none; filter: none; } }
 """
 
-HEAD = (# The design is dark-only (liquid glass): force Gradio's dark theme so its own widgets match.
-        '<script>if(!/__theme=dark/.test(location.search)){const u=new URL(location);u.searchParams.set("__theme","dark");location.replace(u)}</script>'
-        '<link rel="preconnect" href="https://fonts.googleapis.com">'
-        '<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">')
+HEAD = (# Light-only design: force Gradio's light theme so its own widgets match.
+        '<script>if(!/__theme=light/.test(location.search)){const u=new URL(location);u.searchParams.set("__theme","light");location.replace(u)}</script>'
+        # The hero card cycles the same applicant through the three neighbourhoods (real model A answers for the example).
+        '<script>(function(){var s=[["mostly white",0],["mixed",0],["mostly minority",1]],i=0;'
+        'if(matchMedia("(prefers-reduced-motion: reduce)").matches)return;'
+        'setInterval(function(){var a=document.getElementById("hAddr"),v=document.getElementById("hA");if(!a||!v)return;'
+        'i=(i+1)%3;var t=s[i];a.classList.add("out");setTimeout(function(){a.textContent=t[0];a.classList.remove("out");'
+        'v.className="fl-v "+(t[1]?"no":"ok");v.innerHTML="<i></i>"+(t[1]?"Deny":"Approve");'
+        'if(t[1]){var r=document.getElementById("hRowA");r.classList.remove("flash");void r.offsetWidth;r.classList.add("flash");}},350);},2600);})();</script>')
 
 with gr.Blocks(title="FairLens") as demo:
-    gr.HTML("""<div class="fl-hero">
-      <div class="fl-eyebrow">FairLens · built on 264,340 real Georgia mortgage applications (trained on 2022, tested on 2023)</div>
-      <h1>Same person, different address.<br>Does the AI change its answer?</h1>
-      <p>Banks use AI to approve mortgages. These two AIs are <b>never told anyone's race</b>,
-         but one of them is told the neighborhood. Watch what that does.</p></div>""")
+    gr.HTML("""<div class="fl-hero"><div class="fl-haze"></div><div class="fl-grain"></div>
+      <div class="fl-brand fl-rise">FairLens</div>
+      <h1 class="fl-rise fl-d1">Same person.<br>Different address.</h1>
+      <p class="fl-lede fl-rise fl-d2">Banks use AI to approve mortgages. These two AIs are never told anyone's race,
+         but one of them is told the neighborhood. Watch what that does.</p>
+      <div class="fl-live fl-rise fl-d3">
+        <div class="fl-who"><span>$60K a year · $100K loan · 20% down</span><span>Same applicant</span></div>
+        <div class="fl-addr">Home in a <span id="hAddr">mostly white</span> neighborhood</div>
+        <div class="fl-r" id="hRowA"><span>Typical bank AI</span><span class="fl-v ok" id="hA"><i></i>Approve</span></div>
+        <div class="fl-r"><span>Our fixed AI</span><span class="fl-v ok"><i></i>Approve</span></div>
+        <small>Real model answers for one constructed example applicant.</small>
+      </div></div>
+      <div class="fl-stats">
+        <div><strong>3.0×</strong><span>how often a race-blind AI wrongly flagged qualified Black applicants vs. white</span></div>
+        <div><strong>1.2×</strong><span>after our fix, keeping 97% of the model's accuracy score</span></div>
+        <div><strong>264,340</strong><span>real Georgia mortgage applications, 2022–2023</span></div>
+      </div>""")
     out_banner = gr.HTML()
     with gr.Row(equal_height=False):
         with gr.Column(scale=7):
@@ -318,4 +368,4 @@ with gr.Blocks(title="FairLens") as demo:
     demo.load(judge, fields, outs, show_progress="hidden")
 
 if __name__ == "__main__":
-    demo.launch(css=CSS, head=HEAD, theme=gr.themes.Base(primary_hue="sky", neutral_hue="slate", radius_size="lg"))
+    demo.launch(css=CSS, head=HEAD, theme=gr.themes.Base(primary_hue="blue", neutral_hue="slate", radius_size="lg"))
