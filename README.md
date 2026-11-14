@@ -2,13 +2,14 @@
 
 **Track:** AI + Finance · **Team:** KV Gods (Kabir Shah, Vishnu Veer)
 **Starting point:** Extends suggested project 4.2.3 (fairness audit of a loan model) to real 2022–2023 US mortgage data
+**Live demo:** https://kabirshah4.github.io/race-blind-isnt-fair/ · **Code:** https://github.com/kabirshah4/race-blind-isnt-fair
 
 *This project is a prototype and is not financial advice.*
 
 > ## In 10 seconds
 > **A mortgage AI that never sees race still wrongly flagged qualified Black applicants 3× as often as qualified white applicants**, mostly through neighbourhood data. We measured it on 264,340 real Georgia applications, confirmed it in North Carolina, cut the gap to 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps their applicants' finances can't explain.
 >
-> - **Try it:** `python app/app.py` (same person, switch only the address)
+> - **Try it live:** [https://kabirshah4.github.io/race-blind-isnt-fair/](https://kabirshah4.github.io/race-blind-isnt-fair/) (same person, switch only the address; works on phones)
 > - **The finding:** 2,718 qualified Black Georgians wrongly flagged by a race-blind model; neighbourhood explains ~56% of the excess gap
 > - **The tool:** `python src/audit_lender.py --lei <lender>` gives a one-page screening report for any lender
 >
@@ -102,6 +103,7 @@ python src/other_state.py     #    second-state check, North Carolina -> results
 python src/audit_lender.py    #    lender-by-lender audit (anonymised) -> results_lenders.md; add --lei <LEI> for one lender
 python src/charts.py          # 7. charts -> figures/
 python app/app.py             # 8. the demo app -> http://127.0.0.1:7860
+python src/export_demo.py     #    pre-compute answers for the static live demo -> docs/demo_data.json
 ```
 
 Every script starts with a plain-English explanation of what it does and why.
@@ -110,7 +112,8 @@ Every script starts with a plain-English explanation of what it does and why.
 | Folder | What's in it |
 |---|---|
 | `src/` | The pipeline: download → prep → train → fix → audit → counterfactual → charts |
-| `app/` | The Gradio demo |
+| `app/` | The Gradio demo (runs the models live) |
+| `docs/` | The static live demo on GitHub Pages (pre-computed answers from the same models) |
 | `figures/` | Charts used in the write-up |
 | `models/` | Trained models (so the demo runs without retraining) |
 | `results_*.csv/md` | Raw result tables behind every number above |
