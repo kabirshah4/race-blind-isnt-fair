@@ -11,7 +11,7 @@ Both of our families immigrated from India, and our parents went through the pro
 
 ## The problem
 
-Lenders increasingly use machine learning to approve mortgages, and a common defence is that the model "never sees race." But where you live is closely tied to race, so a model can rebuild redlining (outlawed in 1968) without anyone writing it in. We built a race-blind mortgage model and tested whether it treats Black and white applicants differently. Our users are **fair-lending auditors and community groups** checking a lender's model.
+Lenders increasingly use machine learning to approve mortgages, and a common defence is that the model "never sees race." But where you live is closely tied to race, so a model can rebuild redlining (outlawed in 1968) without anyone writing it in. We built a race-blind mortgage model and tested whether it treats Black and white applicants differently. Our user is **a fair-lending analyst at a housing nonprofit or state regulator** who has a lender's public HMDA file and must decide whether a "race-blind" model deserves a closer look.
 
 ## What we built
 

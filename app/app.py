@@ -2,7 +2,7 @@
 
 Run:  .venv/bin/python app/app.py      then open http://127.0.0.1:7860
 Needs models/model_A_full.joblib and models/model_C_fair.joblib (made by src/fix.py)
-and data/processed/hmda_ga.parquet (made by src/prep.py).
+and models/neighbourhoods.json (all made by src/fix.py and included in the repo).
 
 What a judge should get in five seconds
 ---------------------------------------
@@ -16,6 +16,7 @@ What a judge should get in five seconds
 * If a model flags the applicant, "What would change it" tries small, realistic
   changes and reports the first one that flips the decision.
 """
+import json
 import sys
 from pathlib import Path
 
@@ -34,19 +35,10 @@ MODELS = [
     ("fair", "Our fixed AI", "Ignores the neighborhood · fairness-trained", MODEL_C),
 ]
 
-# Three REAL neighbourhood types from Georgia's 2023 census-tract data.
-# Each profile = the median of all 7 tract columns across tracts in that range.
-TRACT_COLS = ["tract_minority_population_percent", "tract_to_msa_income_percentage",
-              "ffiec_msa_md_median_family_income", "tract_population", "tract_owner_occupied_units",
-              "tract_one_to_four_family_homes", "tract_median_age_of_housing_units"]
-_d = pd.read_parquet(ROOT / "data" / "processed" / "hmda_ga.parquet")
-_d = _d[_d.year == 2023]
-_m = _d.tract_minority_population_percent
-NEIGHBOURHOODS = {
-    "Mostly white": _d[_m < 20][TRACT_COLS].median(),
-    "Mixed": _d[(_m >= 40) & (_m <= 60)][TRACT_COLS].median(),
-    "Mostly minority": _d[_m > 90][TRACT_COLS].median(),
-}
+# Three typical neighbourhood profiles from Georgia's 2023 data (medians of the 7 tract
+# numbers in each band). src/fix.py writes this file, so the app needs no data download.
+NEIGHBOURHOODS = {k: pd.Series(v) for k, v in
+                  json.loads((ROOT / "models" / "neighbourhoods.json").read_text()).items()}
 NB_NOTE = {"Mostly white": "under 20% minority", "Mixed": "40–60% minority", "Mostly minority": "over 90% minority"}
 LOAN_TYPES = {"Conventional": "1", "FHA (government-backed)": "2", "VA (veterans)": "3", "USDA (rural)": "4"}
 

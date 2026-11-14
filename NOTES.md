@@ -6,6 +6,10 @@ explain every line of this to a judge. Newest entries are at the bottom.
 **Track:** AI + Finance · **Hackathon:** Veritas AI, Nov 14–15, 2026
 **Deadline:** Sunday Nov 15, 11:59 PM ET (aim to submit a first version by ~6 PM)
 
+> **Read this first.** This is a chronological log. Steps 4–9 show the numbers we had at the
+> time, before we found the third data leak. **Step 10 onward and the README have the final
+> numbers.** We kept the old steps so the mistakes and fixes are visible.
+
 ---
 
 ## The big idea (say this in one breath)
@@ -339,3 +343,14 @@ Black vs white: A 3.01× → drop % minority 2.32× → drop all neighbourhood 1
 
 **Note:** the two explainer videos (Project-Explainer*.mp4) were made before this fix and show the
 old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
+
+### Step 11: Double-blind reviews, second state, final polish (Sat ~2–3 AM)
+- Two more blind AI reviews (no names, no knowledge of each other). Fixes: one shared model
+  setting for every script, the proxy claim reworded (neighbourhood explains about 56% of the
+  excess gap), the strict DTI baseline relabelled, extra counterfactual checks, write-up trimmed
+  to about a page with a technical appendix in the README.
+- **North Carolina check** (`src/other_state.py`): the pattern repeats where we live, with a
+  smaller gap (2.09x -> 1.72x -> 1.42x).
+- Added "Why we care" and the team name (KV Gods).
+- The demo app now reads its neighbourhood profiles from `models/neighbourhoods.json`, so it
+  runs from a fresh clone with no data download.

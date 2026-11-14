@@ -1,0 +1,29 @@
+{
+ "Mostly white": {
+  "tract_minority_population_percent": 15.13,
+  "tract_to_msa_income_percentage": 111.38,
+  "ffiec_msa_md_median_family_income": 91500.0,
+  "tract_population": 4224.0,
+  "tract_owner_occupied_units": 1248.0,
+  "tract_one_to_four_family_homes": 1695.0,
+  "tract_median_age_of_housing_units": 27.0
+ },
+ "Mixed": {
+  "tract_minority_population_percent": 49.07,
+  "tract_to_msa_income_percentage": 107.43,
+  "ffiec_msa_md_median_family_income": 102900.0,
+  "tract_population": 4512.0,
+  "tract_owner_occupied_units": 1035.0,
+  "tract_one_to_four_family_homes": 1476.0,
+  "tract_median_age_of_housing_units": 27.0
+ },
+ "Mostly minority": {
+  "tract_minority_population_percent": 96.31,
+  "tract_to_msa_income_percentage": 68.12,
+  "ffiec_msa_md_median_family_income": 102900.0,
+  "tract_population": 4236.0,
+  "tract_owner_occupied_units": 769.0,
+  "tract_one_to_four_family_homes": 1319.0,
+  "tract_median_age_of_housing_units": 32.0
+ }
+}

@@ -23,6 +23,8 @@ For each model we report:
 """
 from pathlib import Path
 
+import json
+
 import joblib
 import numpy as np
 import pandas as pd
@@ -103,6 +105,16 @@ def main():
     y_train, y_test = (1 - train.approved).to_numpy(), (1 - test.approved).to_numpy()
     flag_share = y_train.mean()  # flag the same share as 2022's denial rate
     results = {}
+
+    # Three typical neighbourhood profiles for the demo app (medians of the 7 tract numbers
+    # across 2023 applications in each band). Saved so the app runs from a fresh clone
+    # without downloading the data.
+    m = test.tract_minority_population_percent
+    profiles = {"Mostly white": test[m < 20][TRACT_FEATURES].median().to_dict(),
+                "Mixed": test[(m >= 40) & (m <= 60)][TRACT_FEATURES].median().to_dict(),
+                "Mostly minority": test[m > 90][TRACT_FEATURES].median().to_dict()}
+    (ROOT / "models").mkdir(exist_ok=True)
+    (ROOT / "models" / "neighbourhoods.json").write_text(json.dumps(profiles, indent=1))
 
     # A, B, B2: ordinary XGBoost with different inputs.
     no_minority = [f for f in NUMERIC_FEATURES if f != "tract_minority_population_percent"]
