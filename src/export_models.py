@@ -93,7 +93,7 @@ def main():
     df["loan_term_360"] = rng.integers(0, 2, n)
     df["has_coapplicant"] = rng.integers(0, 2, n)
     df["loan_type"] = rng.choice(["1", "2", "3", "4"], n)
-    df["conforming_loan_limit"] = np.where(df.loan_amount <= 766, "C", "NC")
+    df["conforming_loan_limit"] = np.where(df.loan_amount <= 726, "C", "NC")  # 2023 conforming limit, $726,200
     df["submission_of_application"] = "1"
     df = df.assign(**list(nbs.values())[rng.integers(0, 3)])
     worst = 0.0
@@ -121,7 +121,7 @@ def main():
     # when only the neighbourhood changes? (Model C never sees the neighbourhood, so 0 by design.)
     rows = pd.DataFrame([{"income": s[0], "loan_amount": s[1], "property_value": s[2], "ltv": s[1] / s[2] * 100,
                           "dti": s[3], "loan_term_360": s[4], "has_coapplicant": s[5], "loan_type": {v: k for k, v in type_name.items()}[s[6]],
-                          "conforming_loan_limit": "C" if s[1] <= 766 else "NC", "submission_of_application": "1"} for s in out["samples"]])
+                          "conforming_loan_limit": "C" if s[1] <= 726 else "NC", "submission_of_application": "1"} for s in out["samples"]])
     A = joblib.load(ROOT / "models" / "model_A_full.joblib")
     deny = {nb: [js_style_risk(out["A"], {**r, **prof}) >= A["cutoff"] for r in rows.to_dict("records")] for nb, prof in nbs.items()}
     flips = sum(len({deny[nb][i] for nb in nbs}) > 1 for i in range(len(rows)))

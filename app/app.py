@@ -8,7 +8,7 @@ What a judge should get in five seconds
 ---------------------------------------
 * The headline says it: same applicant, only the address changes.
 * The neighbourhood switch sits right above the two decisions it changes.
-* Two decision cards: the "typical bank AI" (model A, uses neighbourhood data) and
+* Two decision cards: the "bank-style AI" (model A, uses neighbourhood data) and
   "our fixed AI" (model C, no neighbourhood data + fairness training).
   Neither model ever sees race.
 * "Every neighbourhood at once" shows both models across all three
@@ -31,7 +31,7 @@ from prep import CATEGORICAL_FEATURES  # noqa: E402
 MODEL_A = joblib.load(ROOT / "models" / "model_A_full.joblib")
 MODEL_C = joblib.load(ROOT / "models" / "model_C_fair.joblib")
 MODELS = [
-    ("standard", "Typical bank AI", "Uses the neighborhood · never sees race", MODEL_A),
+    ("standard", "Bank-style AI", "Built like lenders’ models · uses the neighborhood", MODEL_A),
     ("fair", "Our fixed AI", "Ignores the neighborhood · fairness-trained", MODEL_C),
 ]
 
@@ -56,7 +56,7 @@ def build_applicant(income, loan_amount, property_value, dti, loan_type, thirty_
         "income": income, "loan_amount": loan_amount, "property_value": property_value,
         "ltv": min(loan_amount / max(property_value, 1) * 100, 150), "dti": dti,
         "loan_term_360": int(thirty_year), "has_coapplicant": int(coapplicant),
-        "loan_type": LOAN_TYPES[loan_type], "conforming_loan_limit": "C" if loan_amount <= 766 else "NC",
+        "loan_type": LOAN_TYPES[loan_type], "conforming_loan_limit": "C" if loan_amount <= 726 else "NC",
         "submission_of_application": "1",
         **NEIGHBOURHOODS[neighbourhood].to_dict(),
     }
@@ -151,8 +151,8 @@ def banner(grid, neighbourhood):
     if a_flips:
         now = ""
         if here["standard"][neighbourhood] and not here["fair"][neighbourhood]:
-            now = f' At a <b>{neighbourhood.lower()}</b> address, the typical AI says <span class="no">deny</span> and our fixed AI says <span class="ok">approve</span>.'
-        msg = (f'<b>The typical bank AI changes its answer just because of the address.</b> '
+            now = f' At a <b>{neighbourhood.lower()}</b> address, the bank-style AI says <span class="no">deny</span> and our fixed AI says <span class="ok">approve</span>.'
+        msg = (f'<b>The bank-style AI changes its answer just because of the address.</b> '
                f'Our fixed AI gives this person the same answer everywhere.{now}')
     else:
         msg = ("For this applicant, neither AI changes its answer with the address. "
@@ -319,7 +319,7 @@ with gr.Blocks(title="FairView") as demo:
       <div class="fl-live fl-rise fl-d3">
         <div class="fl-who"><span>$60K a year · $100K loan · 20% down</span><span>Same applicant</span></div>
         <div class="fl-addr">Home in a <span id="hAddr">mostly white</span> neighborhood</div>
-        <div class="fl-r" id="hRowA"><span>Typical bank AI</span><span class="fl-v ok" id="hA"><i></i>Approve</span></div>
+        <div class="fl-r" id="hRowA"><span>Bank-style AI</span><span class="fl-v ok" id="hA"><i></i>Approve</span></div>
         <div class="fl-r"><span>Our fixed AI</span><span class="fl-v ok"><i></i>Approve</span></div>
         <small>Real model answers for one constructed example applicant.</small>
       </div></div>
@@ -349,7 +349,7 @@ with gr.Blocks(title="FairView") as demo:
             thirty_year = gr.Checkbox(MAYA["thirty_year"], label="30-year mortgage")
             coapplicant = gr.Checkbox(MAYA["coapplicant"], label="Has a co-applicant")
     gr.HTML("""<div class="fl-foot">Our fixed AI can’t see the neighborhood at all, so here its answer can’t change with the address by design.
-      What matters is the result across all 117,547 real 2023 applications: the typical AI wrongly flagged bank-approved Black applicants
+      What matters is the result across all 117,547 real 2023 applications: the bank-style AI wrongly flagged bank-approved Black applicants
       <b>3.0×</b> as often as white ones; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score.
       The trade-off: white applicants the bank approved are flagged a little more often (4.0% → 5.6%).<br>
       Data: public HMDA records from the CFPB / FFIEC (ffiec.cfpb.gov). Built with pandas, scikit-learn, XGBoost, fairlearn and Gradio; Claude Code helped write code.<br>

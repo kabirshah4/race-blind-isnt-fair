@@ -10,7 +10,9 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-URL = "https://fairview-ai.pages.dev/"
+import os
+URL = os.environ.get("DEMO_URL", "https://fairview-ai.pages.dev/")
+ZOOM = 1.7
 OUT = Path(__file__).parent / "assets"
 OUT.mkdir(exist_ok=True)
 
@@ -27,7 +29,7 @@ document.body.appendChild(c);
 def move(page, selector, click=False, wait=0.9):
     box = page.locator(selector).first.bounding_box()
     x, y = box["x"] + box["width"] / 2, box["y"] + box["height"] / 2
-    page.evaluate(f"(() => {{ const c = document.getElementById('__cur'); c.style.left = '{(x - 4) / 1.5}px'; c.style.top = '{(y - 3) / 1.5}px'; }})()")
+    page.evaluate(f"(() => {{ const c = document.getElementById('__cur'); c.style.left = '{(x - 4) / ZOOM}px'; c.style.top = '{(y - 3) / ZOOM}px'; }})()")
     time.sleep(wait)
     if click:
         page.evaluate("document.getElementById('__cur').style.transform='scale(.82)'")
@@ -36,8 +38,8 @@ def move(page, selector, click=False, wait=0.9):
         page.evaluate("document.getElementById('__cur').style.transform='none'")
 
 
-def scroll_to(page, selector, offset=24, wait=1.4):
-    page.evaluate(f"window.scrollTo({{top: document.querySelector('{selector}').getBoundingClientRect().top + scrollY - {offset}, behavior: 'smooth'}})")
+def scroll_to(page, selector, offset=24, wait=1.4, smooth=True):
+    page.evaluate(f"window.scrollTo({{top: document.querySelector('{selector}').getBoundingClientRect().top + scrollY - {offset}, behavior: '{'smooth' if smooth else 'instant'}'}})")
     time.sleep(wait)
 
 
@@ -49,7 +51,7 @@ def record(name, steps):
         page = ctx.new_page()
         page.goto(URL + "?rec=1")
         page.wait_for_function("document.querySelectorAll('td em').length === 6")
-        page.evaluate("document.documentElement.style.zoom = '1.5'")   # 1280x720 layout, drawn sharp at 1080p
+        page.evaluate(f"document.documentElement.style.zoom = '{ZOOM}'")   # big, readable text at 1080p
         page.evaluate(CURSOR)
         steps(page)
         video = page.video.path()
@@ -60,12 +62,12 @@ def record(name, steps):
 
 def flip(page):
     time.sleep(3.5)                                   # hero card cycling through neighbourhoods
-    scroll_to(page, ".banner", offset=10, wait=2.0)   # banner + step 1 + cards in view
+    scroll_to(page, ".step", offset=8, wait=2.0)       # step 1 + both cards in view
     move(page, '#nb button[data-nb="Mostly minority"]', wait=2.5)
     move(page, '#nb button[data-nb="Mostly white"]', click=True); time.sleep(3.2)
     move(page, '#nb button[data-nb="Mixed"]', click=True); time.sleep(2.6)
     move(page, '#nb button[data-nb="Mostly minority"]', click=True); time.sleep(3.2)
-    scroll_to(page, "#thead", offset=180, wait=1.4)   # the every-address table
+    scroll_to(page, "#thead", offset=120, wait=1.0, smooth=False)   # the every-address table (jump, no smear)
     move(page, "#tbody tr:first-child th", wait=4.0)
 
 
@@ -73,7 +75,7 @@ def random_people(page):
     # Two real 2023 applicants from the 500 random ones: #13 (same answer everywhere, like most people)
     # and #370 ($100K, 24% down, bank approved; the typical AI's answer flips with the address).
     page.evaluate("(() => { const picks = [12, 369]; let i = 0; Math.random = () => (picks[Math.min(i++, picks.length - 1)] + 0.5) / 500; })()")
-    scroll_to(page, ".banner", offset=10, wait=1.2)
+    scroll_to(page, ".step", offset=8, wait=1.2)
     move(page, "#random", wait=1.6)
     move(page, "#random", click=True, wait=0.3); time.sleep(3.0)
     move(page, "#random", click=True, wait=0.3); time.sleep(3.5)

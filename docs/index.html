@@ -126,7 +126,7 @@ input[type=range] { width: 100%; accent-color: var(--navy); min-height: 32px; }
   <div class="live rise d3" aria-hidden="true">
     <div class="who"><span>$60K a year · $100K loan · 20% down</span><span>Same applicant</span></div>
     <div class="addr">Home in a <span id="hAddr">mostly white</span> neighborhood</div>
-    <div class="lr" id="hRowA"><span>Typical bank AI</span><span class="lv ok" id="hA"><i></i>Approve</span></div>
+    <div class="lr" id="hRowA"><span>Bank-style AI</span><span class="lv ok" id="hA"><i></i>Approve</span></div>
     <div class="lr"><span>Our fixed AI</span><span class="lv ok"><i></i>Approve</span></div>
     <small>Real model answers for the example applicant below.</small>
   </div>
@@ -183,7 +183,7 @@ input[type=range] { width: 100%; accent-color: var(--navy); min-height: 32px; }
 
   <div class="foot">
     Our fixed AI can't see the neighborhood at all, so here its answer can't change with the address by design. What matters is the
-    result across all 117,547 real 2023 applications: the typical AI wrongly flagged bank-approved Black applicants <b>3.0×</b> as often as
+    result across all 117,547 real 2023 applications: the bank-style AI wrongly flagged bank-approved Black applicants <b>3.0×</b> as often as
     white ones; our fixed AI brought that to <b>1.2×</b> while keeping 97% of the PR-AUC score. The trade-off: white applicants the bank approved
     are flagged a little more often (4.0% → 5.6%).<br>
     Both AIs run live in your browser: these are the exact trained XGBoost models (every decision tree), exported from Python and checked to give identical answers.
@@ -195,7 +195,7 @@ input[type=range] { width: 100%; accent-color: var(--navy); min-height: 32px; }
 
 <script>
 const MODELS = [
-  { key: "A", title: "Typical bank AI", sub: "Uses the neighborhood · never sees race" },
+  { key: "A", title: "Bank-style AI", sub: "Built like lenders’ models · uses the neighborhood" },
   { key: "C", title: "Our fixed AI", sub: "Ignores the neighborhood · fairness-trained" },
 ];
 const NOTE = { "Mostly white": "under 20% minority", "Mixed": "40–60% minority", "Mostly minority": "over 90% minority" };
@@ -215,7 +215,7 @@ function applicant(s, nb) {
   return {
     income: s.income, loan_amount: s.loan, property_value: s.price, ltv: s.loan / s.price * 100, dti: s.dti,
     loan_term_360: s.thirty, has_coapplicant: s.co, loan_type: LOAN_TYPES[s.lt],
-    conforming_loan_limit: s.loan <= 766 ? "C" : "NC", submission_of_application: "1", ...NBS[nb],
+    conforming_loan_limit: s.loan <= 726 ? "C" : "NC", submission_of_application: "1", ...NBS[nb],
   };
 }
 function risk(key, s, nb) {
@@ -285,8 +285,8 @@ function render() {
   let msg;
   if (aFlips) {
     const here = denied("A", state, state.nb) && !denied("C", state, state.nb)
-      ? ` At a <b>${state.nb.toLowerCase()}</b> address, the typical AI says <span class="tno">deny</span> and our fixed AI says <span class="tok">approve</span>.` : "";
-    msg = `<b>The typical bank AI changes its answer just because of the address.</b> Our fixed AI gives this person the same answer everywhere.${here}`;
+      ? ` At a <b>${state.nb.toLowerCase()}</b> address, the bank-style AI says <span class="tno">deny</span> and our fixed AI says <span class="tok">approve</span>.` : "";
+    msg = `<b>The bank-style AI changes its answer just because of the address.</b> Our fixed AI gives this person the same answer everywhere.${here}`;
   } else {
     msg = `For this applicant, neither AI changes its answer with the address. That's true for most people, but not all: press <b>Random real</b> a few times, or <b>Example</b>.`;
   }
@@ -329,7 +329,7 @@ async function start() {
     const s = { income, loan, price, dti, thirty, co, lt };
     return new Set(Object.keys(NBS).map((nb) => denied("A", s, nb))).size > 1;
   }).length;
-  $("randstat").innerHTML = `Across ${S.length} random real applicants, the typical AI changes its answer just because of the address for <b>${flips} (${Math.round(flips / S.length * 100)}%)</b>. Our fixed AI: 0, since it never sees the address.`;
+  $("randstat").innerHTML = `Across ${S.length} random real applicants, the bank-style AI changes its answer just because of the address for <b>${flips} (${Math.round(flips / S.length * 100)}%)</b>. Our fixed AI: 0, since it never sees the address.`;
   $("who").textContent = WHO_EXAMPLE;
   fillForm(); render();
 }

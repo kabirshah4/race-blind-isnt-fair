@@ -371,6 +371,10 @@ old numbers (2.5×, 1.05×, 0.62). They're for learning, not for submission.
   the page walks the same trees in JavaScript. Any number you type gets a live answer.
   Checked: on 2,000 random applicants, 0 decisions differ from Python. Also on Cloudflare:
   https://race-blind-isnt-fair.pages.dev
+- **Fully blind, thorough grade (official criteria):** ~78–80, #1 of the 7 strongest in both head-to-heads, but only
+  1–3 points ahead of the Madrid air-quality entry. Fixes from it: WRITEUP cut to one page (616 words) with one takeaway;
+  details moved to TECHNICAL.md; "about half" not "56%" (scale-dependent); the over-flagging argument (18.4% flagged vs
+  15.7% denied for Black applicants); honest NC transfer result; "Bank-style AI" label; 2023 loan limit ($726K).
 - **Robustness pack** (blind judges' #1 criticism: no credit scores). `src/robustness.py`: county credit data from the
   Urban Institute (collections, card delinquency) → model A still 3.11×; credit-history denials removed → 2.97×;
   tract-clustered CIs 2.78–3.28×; tuned logistic regression 0.439, other boosted trees 0.515 / 2.64×; fix at the same
