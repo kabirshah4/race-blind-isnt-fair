@@ -1,6 +1,6 @@
 # Race-Blind Isn't Fair: Auditing a Mortgage Model for Neighbourhood Proxies
 
-**Track:** AI + Finance · **Team:** Kabir Shah, Vishnu Veer
+**Track:** AI + Finance · **Team:** KV Gods (Kabir Shah, Vishnu Veer)
 **Starting point:** Extends suggested project 4.2.3 (fairness audit of a loan model) to real 2022–2023 US mortgage data
 
 *This project is a prototype and is not financial advice.*
