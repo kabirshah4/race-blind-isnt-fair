@@ -15,7 +15,7 @@ Lenders increasingly use machine learning to approve mortgages, and a common def
 
 ## What we built
 
-A denial-prediction model trained on **264,340 real Georgia home-purchase applications** (public HMDA data) that never sees race, sex or age; a **fairness audit** of its mistakes by group; a **"proxy detective"** that shows which inputs carry race; two **fixes** with their costs; and a **demo app** where you change only an applicant's neighbourhood and compare the original model with the fixed one.
+A denial-prediction model built on **264,340 real Georgia home-purchase applications** (trained on 146,793 from 2022, tested on 117,547 from 2023) (public HMDA data) that never sees race, sex or age; a **fairness audit** of its mistakes by group; a **"proxy detective"** that shows which inputs carry race; two **fixes** with their costs; and a **demo app** where you change only an applicant's neighbourhood and compare the original model with the fixed one.
 
 ## What we added (beyond 4.2.3)
 

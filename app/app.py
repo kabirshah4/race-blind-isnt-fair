@@ -282,7 +282,7 @@ HEAD = (# The design is dark-only (liquid glass): force Gradio's dark theme so i
 
 with gr.Blocks(title="FairLens") as demo:
     gr.HTML("""<div class="fl-hero">
-      <div class="fl-eyebrow">FairLens · trained on 264,340 real Georgia mortgage applications</div>
+      <div class="fl-eyebrow">FairLens · built on 264,340 real Georgia mortgage applications (trained on 2022, tested on 2023)</div>
       <h1>Same person, different address.<br>Does the AI change its answer?</h1>
       <p>Banks use AI to approve mortgages. These two AIs are <b>never told anyone's race</b>,
          but one of them is told the neighborhood. Watch what that does.</p></div>""")
