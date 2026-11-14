@@ -7,7 +7,7 @@
 
 ## Why we care
 
-Both of our families are Indian immigrants, and we don't want our parents' race to affect whether they can buy a home. So we checked the real data. In Georgia in 2023, banks denied Asian Indian applicants **10.8%** of the time vs. **5.8%** for white applicants (before accounting for finances). When we built an AI that never sees race, it didn't wrongly flag qualified Asian Indian applicants more often, but it did wrongly flag qualified **Black** applicants **3×** as often. A bias you can't see can hit any family, so it has to be checked.
+Both of our families immigrated from India, and our parents went through the process of buying a home. We wanted to know whether something besides their finances, like their race, could quietly affect that decision for families like ours. So we checked the real data. In Georgia in 2023, banks denied Asian Indian applicants **10.8%** of the time vs. **5.8%** for white applicants (before accounting for finances). When we built an AI that never sees race, it didn't wrongly flag qualified Asian Indian applicants more often, but it did wrongly flag qualified **Black** applicants **3×** as often. A bias you can't see can hit any family, so it has to be checked.
 
 ## The problem
 
