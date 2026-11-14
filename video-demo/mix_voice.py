@@ -84,7 +84,7 @@ def clean(name):
     brightness that VoiceFixer (AI) rebuilt. That way the AI can't blur any words."""
     raw, out = V / f"{name}-raw.m4a", V / f"{name}-ready.wav"
     if not name.startswith("kabir-"):   # Vishnu and Kabir's lossless re-record: light cleanup only
-        match = ",equalizer=f=7000:t=h:w=0.7:g=-5" if name.startswith("kabir2") else ""   # Kabir's phone mic is brighter; match Vishnu
+        match = ",highshelf=f=6000:g=-6" if name.startswith("kabir2") else ""   # Kabir's phone mic is brighter; match Vishnu
         run(["ffmpeg", "-y", "-v", "error", "-i", str(raw), "-af", LIGHT + match + "," + LEVEL, "-ar", str(SR), "-ac", "1", str(out)])
         return out
     vf = V / f"{name}-vf.wav"
