@@ -5,7 +5,7 @@
 
 *This project is a prototype and is not financial advice.*
 
-**Main takeaway:** a mortgage AI that never sees race still flagged Black applicants the bank approved about **3×** as often as white ones, largely through neighbourhood data; dropping that data and adding fairness training brings it to about **1.2×** at almost no accuracy cost.
+**Main takeaway:** a mortgage AI that never sees race still flagged Black applicants the bank approved about **3×** as often as white ones (2.9× averaged over 5 retrains), largely through neighbourhood data; dropping that data and adding fairness training brings it to about **1.2×** at almost no accuracy cost.
 
 ## The problem
 
@@ -33,9 +33,9 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 | C. B + fairness training | 0.501 | **1.21×** |
 
 - **It amplifies, not just copies.** Banks denied 15.7% of Black vs 5.8% of white applicants. Model A flags 18.4% of Black applicants (more than were denied) but 6.1% of white ones (about as many).
-- **The address matters:** for 1 in 9 random real applicants, changing only the neighbourhood flips the answer. Neighbourhood data accounts for roughly half the gap.
+- **The address matters:** for 1 in 9 of 500 random real applicants (55), changing only the neighbourhood flips the answer (`results_random_applicants.md`). Neighbourhood data accounts for roughly half the gap.
 - **Robust:** with county credit data added, still **3.11×**; resampling whole neighbourhoods, 2.78–3.28×.
-- **Lenders:** 30 of 60 have a gap the finances we can see don't explain (a lead, not proof).
+- **Lenders:** 30 of 60 have a gap the finances we can see don't explain, after a correction for testing 60 lenders at once (`results_lenders_strict.md`; North Carolina: 24 of 42). A lead, not proof.
 
 **Where it fails:** it misses half of real denials, often for reasons public data can't show (credit history). The fix has a cost: white false alarms rise from 4.0% to 5.6%, and the Georgia-trained fix raises false alarms for both groups in North Carolina. We measure disparities, not intent.
 

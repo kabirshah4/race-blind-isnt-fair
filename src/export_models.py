@@ -126,6 +126,14 @@ def main():
     deny = {nb: [js_style_risk(out["A"], {**r, **prof}) >= A["cutoff"] for r in rows.to_dict("records")] for nb, prof in nbs.items()}
     flips = sum(len({deny[nb][i] for nb in nbs}) > 1 for i in range(len(rows)))
     print(f"random real applicants: typical AI changes its answer with the address for {flips} of {len(rows)} ({flips / len(rows):.0%})")
+    (ROOT / "results_random_applicants.md").write_text(
+        "# Random real applicants: does the address alone change the answer?\n\n"
+        f"500 applications drawn at random (seed 7) from all 117,547 Georgia 2023 test applications. Each one's real finances are "
+        f"scored by model A at three typical neighbourhood profiles (median tract values for under 20%, 40-60% and over 90% minority, "
+        f"`models/neighbourhoods.json`). A 'flip' means model A approves at one profile and flags at another.\n\n"
+        f"**Model A flips for {flips} of {len(rows)} ({flips / len(rows):.0%}, about 1 in 9).** Model C never sees the neighbourhood, so 0 by design.\n\n"
+        "Caveat: the neighbourhoods are three typical profiles, not each applicant's own alternatives. This is the same calculation "
+        "the live demo runs in the browser.\n")
 
     path = ROOT / "docs" / "models.json"
     path.write_text(json.dumps(out, separators=(",", ":")))

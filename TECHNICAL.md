@@ -2,6 +2,19 @@
 
 Everything behind the one-page [WRITEUP.md](WRITEUP.md): methods, every check, and the caveats a careful reviewer should know. Every number cites a `results_*.md` file produced by a script in `src/`.
 
+**Where every headline number comes from**
+
+| Number in the write-up | File | Script |
+|---|---|---|
+| PR-AUC 0.516 vs 0.342; 3.01× → 1.88× → 1.21×; 12.0% vs 4.0%; 2,718 | `results_fix.md` | `src/fix.py` |
+| 2.9× average (2.85–2.95×) over 5 retrains | `results_seeds.md` | `src/seeds.py` |
+| 18.4% flagged vs 15.7% denied (Black); 6.1% vs 5.8% (white); proxy ROC-AUC 0.88 | `results_audit.md` | `src/audit.py` |
+| 1 in 9 of 500 random real applicants (55) | `results_random_applicants.md` | `src/export_models.py` |
+| 3.11× with county credit data; 2.78–3.28× by tract | `results_robustness.md` | `src/robustness.py` |
+| White false alarms 4.0% → 5.6%; misses; examples | `results_failures.md` | `src/failures.py` |
+| North Carolina 2.09× → 1.42× | `results_nc.md` | `src/other_state.py` |
+| 30 of 60 GA lenders (after correction); NC 24 of 42 | `results_lenders_strict.md`, `results_lenders_strict_nc.md` | `src/lender_chart.py` |
+
 **Leakage (three rounds).** (1) Interest rate, rate spread, loan costs and denial reasons only exist after a decision, so we dropped them; the reported loan-to-value was missing for 34% of denials vs. 7.5% of approvals, so we recalculated it as loan ÷ property value. (2) Missing addresses (stored as all-zero tract data) were 5× more common among denials, so we removed those 0.15% of rows. (3) An independent review found `preapproval` (denied pre-approval requests use action code 7, which we never download, so "asked for pre-approval" meant 0% denied) and `initially_payable_to_institution` (code 3 = 83% denied). We removed both and re-ran everything. All numbers are after all three fixes.
 
 **Set-up.** One XGBoost setting is used by every script. Each model's cut-off is set to flag the 2022 denial rate on 2022 data; on 2023 that is 10.3% of applicants for A and 9.5% for C. At the strictest DTI rule's flag rate (DTI > 55%, 2.7% of applicants), the model's precision is 0.94 vs. 0.86 for the rule. A plain logistic regression (PR-AUC 0.338) did not beat the rule, which is why we used XGBoost.
