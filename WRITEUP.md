@@ -39,10 +39,10 @@ Real, current data with a time-based split; a **second-state check in North Caro
 - **Race-blind, yet unfair:** model A wrongly flags **12.0%** of qualified Black applicants vs. **4.0%** of white: **2,718 qualified Black Georgians** in one year.
 - **Neighbourhood is a major proxy:** a second model guesses race from A's inputs with ROC-AUC **0.88** (0.5 = coin flip). Neighbourhood inputs explain about **56%** of the excess gap; the rest comes through loan-to-value, debt-to-income and loan type. Changing **only "% minority residents"** flips 49% of wrongly flagged Black applicants to approved (16% for white).
 - **The fixes:** dropping neighbourhood data costs almost nothing (0.516 → 0.511) and needs no race data, a *less discriminatory alternative*. The fairness constraint cuts the gap to **1.21×** with 97% of the PR-AUC: **1,191 fewer** qualified Black applicants flagged, at a cost of **747 more** qualified white applicants (4.0% → 5.6%).
-- **It holds where we live:** in **North Carolina**, the same recipe gives **2.09× → 1.72× → 1.42×**. The bias is smaller there, and so is the fix's effect.
+- **It holds where we live:** the Georgia model, run **unchanged on North Carolina**, still works (PR-AUC 0.478) and is still unfair (**1.95×**). Retrained in NC, the same recipe gives **2.09× → 1.72× → 1.42×**. The bias is smaller there, and so is the fix's effect.
 - **Which lenders to look at:** our audit tool compares each lender's denials with what applicants' finances alone predict. Across 60 Georgia lenders, the median Black/white denial gap is **2.49×**; after finances, still **1.65×**, and **27 lenders (45%)** have a gap finances can't explain (NC: 24 of 42). Published **anonymised**: without credit scores, it is a reason to look closer, not proof.
 
-**Limitations.** HMDA has no credit scores; labels are past bank decisions, so we measure **disparities, not intent**. Equal false-alarm rates mean unequal precision by group, a known trade-off. Using race in training is legally debated; fix B avoids it. Two states, two years. Details are in the Technical appendix.
+**Limitations.** HMDA has no credit scores; labels are past bank decisions, so we measure **disparities, not intent**. Equal false-alarm rates mean unequal precision by group, a known trade-off. Fix B needs no race data at all; fix C uses race only during training, which is legally debated under ECOA, so B is the safer choice for a real lender. Two states, two years. Details are in the Technical appendix.
 
 ## What we'd do next
 
