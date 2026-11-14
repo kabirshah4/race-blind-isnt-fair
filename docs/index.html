@@ -42,7 +42,7 @@ button:focus-visible, select:focus-visible, input:focus-visible { outline: 2px s
 .dot { width: 8px; height: 8px; border-radius: 50%; background: var(--state); flex: none; }
 .mk { font-size: 14px; color: var(--muted); font-variant-numeric: tabular-nums; } .mk b { color: var(--ink); font-weight: 600; }
 .meter { position: relative; height: 4px; background: var(--line2); border-radius: 2px; margin: 10px 0 6px; }
-.fill { position: absolute; inset: 0 auto 0 0; background: var(--state); border-radius: 2px; transition: width 200ms ease-out; }
+.fill { position: absolute; inset: 0; background: var(--state); border-radius: 2px; transform-origin: 0 50%; transition: transform 200ms ease-out; }
 .tick { position: absolute; top: -5px; bottom: -5px; width: 1.5px; background: var(--ink); }
 .scale { position: relative; height: 16px; font-size: 12px; color: var(--muted); }
 .scale .tl { position: absolute; transform: translateX(-50%); white-space: nowrap; }
@@ -169,7 +169,7 @@ function card(m) {
     <div class="ct">${m.title}</div><div class="cs">${m.sub}</div>
     <div class="verdict"><span class="dot"></span>${bad ? "Would deny" : "Would approve"}</div>
     <div class="mk">Chance this AI says deny: <b>${pct(r)}</b></div>
-    <div class="meter"><div class="fill" style="width:${fill.toFixed(1)}%"></div><div class="tick" style="left:${tick.toFixed(1)}%"></div></div>
+    <div class="meter"><div class="fill" style="transform:scaleX(${(fill / 100).toFixed(3)})"></div><div class="tick" style="left:${tick.toFixed(1)}%"></div></div>
     <div class="scale"><span>0%</span><span class="tl" style="left:${tick.toFixed(1)}%">denies above ${pct(cut)}</span></div>
     ${bad ? `<div class="fix"><small>What would change its mind?</small><div>${advice(m.key, state)}</div></div>` : ""}
   </article>`;
