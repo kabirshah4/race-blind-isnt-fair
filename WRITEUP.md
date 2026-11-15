@@ -9,7 +9,7 @@
 
 ## The problem
 
-Lenders defend AI underwriting because the model "never sees race." But where you live is tied to race, so a model can quietly rebuild redlining. Our user is **a fair-lending analyst** at a housing nonprofit or state regulator, deciding whether a lender's "race-blind" model, or the lender itself, deserves a closer look. Economists have shown that machine-learning credit models can leave Black and Hispanic borrowers worse off without seeing race (Fuster et al., 2022); we test this on 2023 data, measure the neighbourhood's share and test fixes. We care because both our families immigrated from India and bought homes.
+Lenders defend AI underwriting because the model "never sees race." But where you live is tied to race, so a model can discriminate by address without anyone intending it. Our user is **a fair-lending analyst** at a housing nonprofit or state regulator, deciding whether a lender's "race-blind" model, or the lender itself, deserves a closer look. Economists have shown that machine-learning credit models can leave Black and Hispanic borrowers worse off without seeing race (Fuster et al., 2022); we test this on 2023 data, measure the neighbourhood's share and test fixes. We care because both our families immigrated from India and bought homes.
 
 ## What we built
 
@@ -37,7 +37,7 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 - **Robust:** with county credit data added, still **3.11×**; resampling whole neighbourhoods, 2.78–3.28×. **Placebo tests:** shuffling race labels gives 1.00×; giving everyone a random neighbourhood gives 1.88×, the same as removing neighbourhood data.
 - **Lenders:** 30 of 60 have a gap the finances we can see don't explain, after a correction for testing 60 lenders at once (`results_lenders_strict.md`; North Carolina: 24 of 42). A lead, not proof.
 
-**Where it fails:** it misses half of real denials, often for reasons public data can't show (credit history). The fix has a cost: white false alarms rise from 4.0% to 5.6%, and the Georgia-trained fix raises false alarms for both groups in North Carolina. We measure disparities, not intent.
+**Where it fails:** it misses half of real denials, often for reasons public data can't show (credit history). The fix has a cost: white false alarms rise from 4.0% to 5.6%, and the Georgia-trained fix raises false alarms for both groups in North Carolina. Model A is our stand-in, not a lender's real system; most lenders use Fannie Mae and Freddie Mac software we could not test. We measure disparities, not intent.
 
 ## What we'd do next
 
