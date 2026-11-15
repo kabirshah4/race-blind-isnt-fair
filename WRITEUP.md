@@ -5,7 +5,7 @@
 
 *This project is a prototype and is not financial advice.*
 
-**Main takeaway:** a mortgage AI that never sees race still flagged Black applicants the bank approved about **3×** as often as white ones (2.9× averaged over 5 retrains), largely through neighbourhood data; dropping that data and adding fairness training brings it to about **1.2×** at almost no accuracy cost.
+**Main takeaway:** a mortgage AI that never sees race still flagged Black applicants the bank approved about **3×** as often as white ones (2.9× averaged over 5 retrains), largely through neighbourhood data; dropping that data and adding fairness training brings it to about **1.2×** at a small accuracy cost (PR-AUC 0.516 → 0.501).
 
 ## The problem
 
@@ -17,7 +17,7 @@ Lenders defend AI underwriting because the model "never sees race." But where yo
 
 ## What we added
 
-Starting point: suggested project **4.2.3** (fairness audit of a loan model). We added **264,340 real, current applications** with a time split, a **"same person, different address"** test, two **fixes** with their costs, a **second state** (North Carolina, where we live), a **lender audit** and **robustness checks** for missing credit data.
+Starting point: suggested project **4.2.3** (fairness audit of a loan model). We added **264,340 real 2022–2023 applications** with a time split, a **"same person, different address"** test, two **fixes** with their costs, a **second state** (North Carolina, where we live), a **lender audit** and **robustness checks** for missing credit data.
 
 ## How it works
 
@@ -28,9 +28,9 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 | Model (2023 test data) | PR-AUC | Black vs white false alarms |
 |---|---|---|
 | Baseline: deny if debts > 43% of income | 0.342 | — |
-| **A. Bank-style AI, all inputs** | **0.516** | **3.01×** (5 retrains: 2.85–2.95×) |
+| **A. Bank-style AI, all inputs** | **0.516** | **3.01×** (5 retrains with other random seeds: 2.85–2.95×) |
 | B. No neighbourhood data | 0.511 | 1.88× |
-| C. B + fairness training | 0.501 | **1.21×** |
+| C. B + fairness training | 0.501 | **1.21×** (0.95× retrained on all 146,793 rows) |
 
 - **It amplifies, not just copies.** Banks denied 15.7% of Black vs 5.8% of white applicants. Model A flags 18.4% of Black applicants (more than were denied) but 6.1% of white ones (about as many).
 - **The address matters:** for 1 in 9 of 500 random real applicants (55), changing only the neighbourhood flips the answer (`results_random_applicants.md`). Neighbourhood data accounts for roughly half the gap.
