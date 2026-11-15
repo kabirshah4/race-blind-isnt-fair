@@ -7,6 +7,7 @@ Everything behind the one-page [WRITEUP.md](WRITEUP.md): methods, every check, a
 | Number in the write-up | File | Script |
 |---|---|---|
 | PR-AUC 0.516 vs 0.342; 3.01× → 1.88× → 1.21×; 12.0% vs 4.0%; 2,718 | `results_fix.md` | `src/fix.py` |
+| About 1,800 extra (video): 2,718 bank-approved Black applicants flagged at 12.0% vs. 906 expected at the white rate of 4.0% | `results_counterfactual.md` (2,718), `results_fix.md` (12% / 4%) | `src/counterfactual.py`, `src/fix.py` |
 | 2.9× average (2.85–2.95×) over 5 retrains | `results_seeds.md` | `src/seeds.py` |
 | 18.4% flagged vs 15.7% denied (Black); 6.1% vs 5.8% (white); proxy ROC-AUC 0.88 | `results_audit.md` | `src/audit.py` |
 | 1 in 9 of 500 random real applicants (55) | `results_random_applicants.md` | `src/export_models.py` |

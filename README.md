@@ -9,11 +9,12 @@
 > ## In 10 seconds
 > [![Watch the 2-minute demo video](docs/video-thumbnail.jpg)](https://www.youtube.com/watch?v=ThfnVjNuL9M)
 >
-> **A mortgage AI trained on lenders' past decisions (public data, so no credit scores), never shown race, still flagged bank-approved Black applicants as likely denied about 3× as often as white ones** (2.9× averaged over 5 retrains), largely through neighbourhood data. We measured it on 264,340 real Georgia applications, found a smaller but similar gap in North Carolina (about 2×), cut the gap to about 1.2× with a fairness-constrained model, and built a tool that shows which lenders' gaps the finances we can see don't explain (30 of 60 Georgia lenders after a correction for testing many lenders at once; a lead, not proof).
+> **A mortgage AI that never sees race still flagged bank-approved Black applicants as likely denied about 3× as often as white ones, largely through neighbourhood data.** Dropping neighbourhood data and adding fairness training cuts that to about 1.2×.
 >
 > - **Try it live:** [fairview-ai.pages.dev](https://fairview-ai.pages.dev) (same person, switch only the address; works on phones)
+> - **The data:** 264,340 real Georgia applications (public HMDA data, so no credit scores); a smaller but similar gap in North Carolina (about 2×)
 > - **The finding:** 2,718 bank-approved Black Georgians flagged as likely denied by a race-blind model (stable across 5 retrains: 2.85–2.95×); neighbourhood explains roughly half of it; the gap survives county credit data (3.11×)
-> - **Lender audit page:** [fairview-ai.pages.dev/lenders.html](https://fairview-ai.pages.dev/lenders.html), all 60 Georgia and 42 NC lenders, anonymised, with uncertainty
+> - **Lender audit page:** [fairview-ai.pages.dev/lenders.html](https://fairview-ai.pages.dev/lenders.html): 30 of 60 Georgia lenders have gaps the finances we can see don't explain, after a correction for testing many lenders at once (a lead, not proof); all 60 GA and 42 NC lenders, anonymised
 > - **The tool:** `python src/audit_lender.py --lei <lender>` gives a one-page screening report for any lender
 >
 > ![The fix](figures/3_the_fix.png)
@@ -61,5 +62,3 @@ Every script starts with a plain-English explanation of what it does and why.
 | `figures/` | Charts used in the write-up |
 | `models/` | Trained models (so the demo runs without retraining) |
 | `results_*.csv/md` | Raw result tables behind every number above |
-
-![The fix](figures/3_the_fix.png)
