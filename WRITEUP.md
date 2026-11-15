@@ -41,7 +41,7 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 
 ## What we'd do next
 
-Add applicant-level credit scores through a lender or regulator partnership, and extend the audit to all 50 states.
+Join Fannie Mae and Freddie Mac loan data, which has credit scores but no race, by 3-digit zip code; test whether neighbourhood enters through home appraisals (FHFA appraisal statistics); and extend the audit to all 50 states.
 
 ## Sources
 
