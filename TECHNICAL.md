@@ -11,6 +11,7 @@ Everything behind the one-page [WRITEUP.md](WRITEUP.md): methods, every check, a
 | 18.4% flagged vs 15.7% denied (Black); 6.1% vs 5.8% (white); proxy ROC-AUC 0.88 | `results_audit.md` | `src/audit.py` |
 | 1 in 9 of 500 random real applicants (55) | `results_random_applicants.md` | `src/export_models.py` |
 | 3.11× with county credit data; 2.78–3.28× by tract | `results_robustness.md` | `src/robustness.py` |
+| Placebo: race shuffled 1.00×; random neighbourhoods 1.88× | `results_placebo.md` | `src/placebo.py` |
 | White false alarms 4.0% → 5.6%; misses; examples | `results_failures.md` | `src/failures.py` |
 | North Carolina 2.09× → 1.42× | `results_nc.md` | `src/other_state.py` |
 | 30 of 60 GA lenders (after correction); NC 24 of 42 | `results_lenders_strict.md`, `results_lenders_strict_nc.md` | `src/lender_chart.py` |

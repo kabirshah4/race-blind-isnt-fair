@@ -41,6 +41,7 @@ python src/case_study.py      #    one real applicant model A wrongly flags -> r
 python src/lender_chart.py    #    lender chart + multiple-testing correction -> results_lenders_strict.md, figures/4_lenders.png
 python src/seeds.py           #    retrain A, B, C with 5 seeds (training randomness) -> results_seeds.md
 python src/robustness.py      #    credit stand-ins (Urban Institute county data), credit-history denials removed, same-flag-rate fix, stronger baselines, tract-level CIs -> results_robustness.md
+python src/placebo.py         #    placebo tests: race labels shuffled, fake neighbourhoods -> results_placebo.md
 python src/robustness_c.py    #    model C retrained on all of 2022 (slow) -> results_robustness_c.md
 python src/export_lenders.py  #    lender results for the web page -> docs/lenders.json
 python src/failures.py        #    where it fails: misses by the bank's denial reason, address-only false alarms, fix costs by group -> results_failures.md

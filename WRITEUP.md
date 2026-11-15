@@ -9,7 +9,7 @@
 
 ## The problem
 
-Lenders defend AI underwriting because the model "never sees race." But where you live is tied to race, so a model can quietly rebuild redlining. Our user is **a fair-lending analyst** at a housing nonprofit or state regulator, deciding whether a lender's "race-blind" model, or the lender itself, deserves a closer look. We care because both our families immigrated from India and bought homes.
+Lenders defend AI underwriting because the model "never sees race." But where you live is tied to race, so a model can quietly rebuild redlining. Our user is **a fair-lending analyst** at a housing nonprofit or state regulator, deciding whether a lender's "race-blind" model, or the lender itself, deserves a closer look. Economists have shown that machine-learning credit models can leave Black and Hispanic borrowers worse off relative to others even without seeing race (Fuster et al., *Predictably Unequal?*, 2022); we test this on 2023 data, measure how much comes from neighbourhood data, and test fixes. We care because both our families immigrated from India and bought homes.
 
 ## What we built
 
@@ -34,7 +34,7 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 
 - **It amplifies, not just copies.** Banks denied 15.7% of Black vs 5.8% of white applicants. Model A flags 18.4% of Black applicants (more than were denied) but 6.1% of white ones (about as many).
 - **The address matters:** for 1 in 9 of 500 random real applicants (55), changing only the neighbourhood flips the answer (`results_random_applicants.md`). Neighbourhood data accounts for roughly half the gap.
-- **Robust:** with county credit data added, still **3.11×**; resampling whole neighbourhoods, 2.78–3.28×.
+- **Robust:** with county credit data added, still **3.11×**; resampling whole neighbourhoods, 2.78–3.28×. **Placebo tests:** with race labels shuffled the gap is 1.00×; giving everyone a random real neighbourhood drops it to 1.88×, the same as removing neighbourhood data (`results_placebo.md`).
 - **Lenders:** 30 of 60 have a gap the finances we can see don't explain, after a correction for testing 60 lenders at once (`results_lenders_strict.md`; North Carolina: 24 of 42). A lead, not proof.
 
 **Where it fails:** it misses half of real denials, often for reasons public data can't show (credit history). The fix has a cost: white false alarms rise from 4.0% to 5.6%, and the Georgia-trained fix raises false alarms for both groups in North Carolina. We measure disparities, not intent.
@@ -45,4 +45,4 @@ Add applicant-level credit scores through a lender or regulator partnership, and
 
 ## Sources
 
-HMDA data, CFPB/FFIEC (https://ffiec.cfpb.gov/data-browser/) · Urban Institute, Debt in America (https://apps.urban.org/features/debt-interactive-map/) · pandas, scikit-learn, XGBoost (https://xgboost.ai), fairlearn (https://fairlearn.org) · **AI tool:** Claude Code (https://claude.com/claude-code), used to help write code, review methods and draft text; we reviewed and can explain every step. **Video:** HyperFrames (https://hyperframes.heygen.com), VoiceFixer (https://github.com/haoheliu/voicefixer) and RNNoise for voice cleanup, Whisper via faster-whisper (https://github.com/SYSTRAN/faster-whisper) to time the voiceover, sound effects from Pixabay (https://pixabay.com/sound-effects/, Pixabay License); the background music was generated in our own code.
+HMDA data, CFPB/FFIEC (https://ffiec.cfpb.gov/data-browser/) · Fuster, Goldsmith-Pinkham, Ramadorai & Walther (2022), "Predictably Unequal? The Effects of Machine Learning on Credit Markets," *Journal of Finance* 77(1) · Urban Institute, Debt in America (https://apps.urban.org/features/debt-interactive-map/) · pandas, scikit-learn, XGBoost (https://xgboost.ai), fairlearn (https://fairlearn.org) · **AI tool:** Claude Code (https://claude.com/claude-code), used to help write code, review methods and draft text; we reviewed and can explain every step. **Video:** HyperFrames (https://hyperframes.heygen.com), VoiceFixer (https://github.com/haoheliu/voicefixer) and RNNoise for voice cleanup, Whisper via faster-whisper (https://github.com/SYSTRAN/faster-whisper) to time the voiceover, sound effects from Pixabay (https://pixabay.com/sound-effects/, Pixabay License); the background music was generated in our own code.
