@@ -19,6 +19,17 @@
 >
 > ![The fix](figures/3_the_fix.png)
 
+## In plain English
+
+More and more lenders use computer programs to help decide who gets a home loan. These programs are not told the applicant's race. **We asked: can a program still treat Black and white applicants differently, just because of where they live?**
+
+1. **We built a loan-decision program** and trained it on 146,793 real Georgia mortgage decisions from 2022, published by the government.
+2. **We tested it on 2023 applications** and looked only at people the bank *approved*, counting how often the program wrongly said "likely denied."
+3. **It made that mistake for 12% of approved Black applicants but only 4% of approved white ones: about 3 times as often.** Roughly half of that gap came from neighbourhood information, such as the area's income level and share of minority residents.
+4. **We shrank the gap.** Without neighbourhood information, and with training that balances mistakes between groups, the program wrongly flagged 6.8% of Black and 5.6% of white applicants (about 1.2 times), while staying nearly as accurate.
+
+On the [website](https://fairview-ai.pages.dev) you can take one applicant, change only their address, and watch the program's answer change. Our model is a stand-in we built from public data, not any real lender's system, and the data has no credit scores, so this shows a risk to check for, not proof that a lender discriminates.
+
 **→ One-page write-up: [WRITEUP.md](WRITEUP.md) · Methods, every check and caveats: [TECHNICAL.md](TECHNICAL.md)**
 
 ---
