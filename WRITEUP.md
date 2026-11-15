@@ -21,7 +21,7 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 
 ## How it works
 
-**Data:** public HMDA records (CFPB): Georgia home-purchase applications, approved or denied; trained on 2022 (146,793), tested on 2023 (117,547). We removed three leaks (e.g. columns filled in after the decision). **Model:** XGBoost on 17 inputs (finances plus 7 neighbourhood statistics). We can't open a real bank's model, so we built one the way lenders do, trained on their past decisions. **Fairness measure:** false alarms, the share of bank-approved applicants the model flags.
+**Data:** public HMDA records (CFPB): Georgia home-purchase applications, approved or denied; trained on 2022 (146,793), tested on 2023 (117,547). We removed three leaks (e.g. columns filled in after the decision). **Model:** XGBoost on 17 inputs (finances plus 7 neighbourhood statistics). We can't open a real bank's model, so we built one the way lenders do, trained on their past decisions. Model C uses race labels only during training, to balance false alarms, and never when scoring an applicant. **Fairness measure:** false alarms, the share of bank-approved applicants the model flags.
 
 ## Results
 

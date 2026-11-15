@@ -10,7 +10,7 @@ What a judge should get in five seconds
 * The neighbourhood switch sits right above the two decisions it changes.
 * Two decision cards: the "bank-style AI" (model A, uses neighbourhood data) and
   "our fixed AI" (model C, no neighbourhood data + fairness training).
-  Neither model ever sees race.
+  Neither model is given race when it decides.
 * "Every neighbourhood at once" shows both models across all three
   neighbourhoods, so the flip is visible without clicking anything.
 * If a model flags the applicant, "What would change it" tries small, realistic
@@ -171,7 +171,7 @@ def judge(income, loan_amount, property_value, dti, loan_type, thirty_year, coap
         cards.append(card(title, sub, risk, bundle["cutoff"], advice))
     grid = everywhere(inputs)
     return (banner(grid, neighbourhood),
-            f'{step(2, "Compare the two AIs. Neither one ever sees race.")}<div class="fl-cards">{"".join(cards)}</div>',
+            f'{step(2, "Compare the two AIs. Neither one is given race when it decides.")}<div class="fl-cards">{"".join(cards)}</div>',
             strip(grid))
 
 
