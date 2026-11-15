@@ -62,3 +62,11 @@ Every script starts with a plain-English explanation of what it does and why.
 | `figures/` | Charts used in the write-up |
 | `models/` | Trained models (so the demo runs without retraining) |
 | `results_*.csv/md` | Raw result tables behind every number above |
+
+## Sources
+
+- **Data:** HMDA mortgage application data, CFPB/FFIEC (https://ffiec.cfpb.gov/data-browser/); Urban Institute, Debt in America, county credit data (https://apps.urban.org/features/debt-interactive-map/)
+- **Research:** Fuster, Goldsmith-Pinkham, Ramadorai & Walther (2022), "Predictably Unequal? The Effects of Machine Learning on Credit Markets," *Journal of Finance* 77(1)
+- **Libraries:** pandas, scikit-learn, XGBoost (https://xgboost.ai), fairlearn (https://fairlearn.org), Gradio (demo app)
+- **AI tool:** Claude Code (https://claude.com/claude-code), used to help write code, review methods and draft text; we reviewed and can explain every step
+- **Video:** HyperFrames (https://hyperframes.heygen.com); VoiceFixer, RNNoise and faster-whisper for voice cleanup and timing; Pixabay sound effects (Pixabay License); music generated in our own code
