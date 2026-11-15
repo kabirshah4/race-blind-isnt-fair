@@ -30,7 +30,7 @@ Starting point: suggested project **4.2.3** (fairness audit of a loan model). We
 | Baseline: deny if debts > 43% of income | 0.342 | — |
 | **A. Bank-style AI, all inputs** | **0.516** | **3.01×** (5 retrains with other random seeds: 2.85–2.95×) |
 | B. No neighbourhood data | 0.511 | 1.88× |
-| C. B + fairness training | 0.501 | **1.21×** (0.95× retrained on all 146,793 rows) |
+| C. B + fairness training | 0.501 | **1.21×** (trained on a 60,000-row sample for speed; 0.95× on all 146,793 rows, PR-AUC 0.494) |
 
 - **It amplifies, not just copies.** Banks denied 15.7% of Black vs 5.8% of white applicants. Model A flags 18.4% of Black applicants (more than were denied) but 6.1% of white ones (about as many).
 - **The address matters:** for 1 in 9 of 500 random real applicants (55), changing only the neighbourhood flips the answer (`results_random_applicants.md`). Neighbourhood data accounts for roughly half the gap.
